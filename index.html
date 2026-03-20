@@ -6,9 +6,26 @@
   <style>
     body {
       margin: 0;
-      background: radial-gradient(circle at top, #111, #000);
+      background: black;
       color: white;
       font-family: Arial;
+      overflow-x: hidden;
+    }
+
+    /* ANIMATED BACKGROUND */
+    body::before {
+      content: "";
+      position: fixed;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(176,38,255,0.1), transparent 70%);
+      animation: smoke 20s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes smoke {
+      from { transform: translate(0,0); }
+      to { transform: translate(-200px, -200px); }
     }
 
     h1 {
@@ -18,12 +35,6 @@
       letter-spacing: 8px;
       margin-top: 60px;
       text-shadow: 0 0 20px gold;
-      animation: glow 2s infinite alternate;
-    }
-
-    @keyframes glow {
-      from { text-shadow: 0 0 10px gold; }
-      to { text-shadow: 0 0 30px gold, 0 0 60px #b026ff; }
     }
 
     .subtitle {
@@ -34,25 +45,24 @@
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1000px;
       margin: auto;
       padding: 20px;
     }
 
     .box {
-      background: rgba(20,20,20,0.8);
+      background: rgba(20,20,20,0.85);
       border: 1px solid #222;
       border-radius: 15px;
       padding: 30px;
       margin-bottom: 40px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(6px);
       box-shadow: 0 0 20px rgba(176,38,255,0.2);
       transition: 0.3s;
     }
 
     .box:hover {
       box-shadow: 0 0 30px rgba(176,38,255,0.5);
-      transform: scale(1.01);
     }
 
     .box h2 {
@@ -60,47 +70,57 @@
       margin-bottom: 20px;
     }
 
+    /* BUTTON FIX (NO BLUR BUG) */
     .btn {
       display: inline-block;
       padding: 12px 35px;
       border: 2px solid gold;
       color: gold;
       text-decoration: none;
-      transition: 0.3s;
+      transition: all 0.2s ease;
       margin-top: 10px;
       letter-spacing: 2px;
+      transform: translateZ(0); /* FIX BLUR */
     }
 
     .btn:hover {
       background: #b026ff;
       border-color: #b026ff;
       color: white;
-      box-shadow: 0 0 20px #b026ff;
+      box-shadow: 0 0 15px #b026ff;
     }
 
     /* TABLE */
     table {
       width: 100%;
       border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 15px;
-      border-bottom: 1px solid #222;
+      text-align: center;
     }
 
     th {
       color: #888;
-      text-transform: uppercase;
       font-size: 12px;
+      padding-bottom: 10px;
     }
 
     td {
-      color: #ccc;
+      padding: 20px;
     }
 
     tr:hover {
       background: rgba(176,38,255,0.1);
+    }
+
+    /* FILE STYLE */
+    .file-name {
+      font-size: 18px;
+      color: white;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
     }
 
     .download-btn {
@@ -108,13 +128,13 @@
       border: 1px solid #b026ff;
       color: #b026ff;
       text-decoration: none;
-      transition: 0.3s;
+      transition: 0.2s;
     }
 
     .download-btn:hover {
       background: #b026ff;
       color: white;
-      box-shadow: 0 0 15px #b026ff;
+      box-shadow: 0 0 10px #b026ff;
     }
 
     /* LICENSE */
@@ -131,11 +151,6 @@
       cursor: pointer;
       color: gold;
       text-align: center;
-      transition: 0.3s;
-    }
-
-    .license-header:hover {
-      color: #b026ff;
     }
 
     .license-content {
@@ -144,17 +159,6 @@
       color: #aaa;
       max-height: 300px;
       overflow-y: auto;
-      animation: fadeIn 0.4s;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0;}
-      to {opacity: 1;}
-    }
-
-    .size {
-      color: #888;
-      font-size: 12px;
     }
 
   </style>
@@ -190,22 +194,20 @@
       <tr>
         <th>Date</th>
         <th>File</th>
-        <th>Size</th>
         <th></th>
       </tr>
 
       <tr>
         <td>2026-03-20</td>
-        <td>Program 1</td>
-        <td class="size">12 MB</td>
-        <td><a class="download-btn" href="files/program1.zip">Download</a></td>
-      </tr>
 
-      <tr>
-        <td>2026-03-20</td>
-        <td>Fake Virus</td>
-        <td class="size">2 MB</td>
-        <td><a class="download-btn" href="files/fakevirus.exe">Download</a></td>
+        <td>
+          <div class="file-name">TEST BUTTON</div>
+          <div class="file-size">0 MB</div>
+        </td>
+
+        <td>
+          <a class="download-btn" href="files/program1.zip">Download</a>
+        </td>
       </tr>
 
     </table>
@@ -222,26 +224,15 @@
   <div class="license-content" id="licenseContent">
 
     <p>
-    This platform (NΞXUS) provides digital content including software, tools, and simulated "fake virus" programs strictly for educational and entertainment purposes.
+    All content is provided for educational and entertainment purposes only.
     </p>
 
     <p>
-    By accessing or downloading any material, you agree that:
-    </p>
-
-    <ul>
-      <li>You will not use any content for malicious or harmful activities</li>
-      <li>You understand these are simulations and experimental tools</li>
-      <li>You take full responsibility for any usage</li>
-      <li>You will not redistribute or modify files without permission</li>
-    </ul>
-
-    <p>
-    NΞXUS is not liable for any damage, misuse, or legal consequences.
+    You agree not to use any content for harmful or illegal activities.
     </p>
 
     <p>
-    All content is provided "as is" without warranties.
+    Use everything at your own risk. NΞXUS is not responsible for any damage.
     </p>
 
   </div>
