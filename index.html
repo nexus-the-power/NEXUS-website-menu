@@ -1,90 +1,116 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-  // 🔥 A TE FIREBASE KONFIGURÁCIÓD (nexus-67676)
-  const firebaseConfig = {
-    apiKey: "AIzaSyDW0lUVCf0N8VmLwmlnyoc2GAdW6llHuKs",
-    authDomain: "nexus-67676.firebaseapp.com",
-    projectId: "nexus-67676",
-    storageBucket: "nexus-67676.firebasestorage.app",
-    messagingSenderId: "640354273542",
-    appId: "1:640354273542:web:128bbc9ce5eb9e09557687",
-    measurementId: "G-C9CPN7FEP4"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-  const db = getFirestore(app);   // <-- Firestore inicializálása
-
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const userInfo = document.getElementById('userInfo');
-  const downloadsCard = document.getElementById('downloadsCard');
-
-  // Felhasználó állapotának figyelése
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      loginBtn.style.display = 'none';
-      logoutBtn.style.display = 'inline-flex';
-      userInfo.style.display = 'inline-block';
-      userInfo.innerHTML = `👋 Üdv, ${user.displayName || user.email}!`;
-      downloadsCard.style.display = 'block';
-
-      // 🔽 Létrehozzuk a felhasználó dokumentumát a Firestore-ban (ha még nincs)
-      const userRef = doc(db, 'users', user.uid);
-      try {
-        await setDoc(userRef, {
-          email: user.email,
-          name: user.displayName,
-          lastLogin: serverTimestamp(),
-          downloads: []
-        }, { merge: true });
-        console.log("✅ Felhasználó dokumentum sikeresen elmentve");
-      } catch (error) {
-        console.error("❌ Hiba a dokumentum mentésekor:", error);
-        userInfo.innerHTML = `⚠️ Adatbázis hiba: ${error.message}`;
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NΞXUS — lightning core</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <!-- Firebase moduláris SDK (10.8.0) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
       }
-    } else {
-      loginBtn.style.display = 'inline-flex';
-      logoutBtn.style.display = 'none';
-      userInfo.style.display = 'none';
-      userInfo.innerHTML = '';
-      downloadsCard.style.display = 'none';
     }
-  });
+  </script>
+  <style>
+    /* ... (a teljes CSS marad, ugyanaz, mint a korábbi verziókban) ... */
+  </style>
+</head>
+<body>
+  <!-- ... HTML struktúra (ugyanaz, mint a korábbi működő verzióban) ... -->
 
-  loginBtn.onclick = () => signInWithPopup(auth, provider);
-  logoutBtn.onclick = () => signOut(auth);
+  <script type="module">
+    import { initializeApp } from "firebase/app";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
+    import { getFirestore, doc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "firebase/firestore";
 
-  // Naplózás funkció
-  async function logDownload(fileName, fileUrl) {
-    const user = auth.currentUser;
-    if (!user) return;
-    const userRef = doc(db, 'users', user.uid);
-    const downloadEntry = {
-      fileName: fileName,
-      url: fileUrl,
-      downloadedAt: serverTimestamp()
+    const firebaseConfig = {
+      apiKey: "AIzaSyDW0lUVCf0N8VmLwmlnyoc2GAdW6llHuKs",
+      authDomain: "nexus-67676.firebaseapp.com",
+      projectId: "nexus-67676",
+      storageBucket: "nexus-67676.firebasestorage.app",
+      messagingSenderId: "640354273542",
+      appId: "1:640354273542:web:128bbc9ce5eb9e09557687",
+      measurementId: "G-C9CPN7FEP4"
     };
-    try {
-      await updateDoc(userRef, {
-        downloads: arrayUnion(downloadEntry)
-      });
-      console.log(`📥 Letöltés naplózva: ${fileName}`);
-    } catch (error) {
-      console.error("Naplózási hiba:", error);
-    }
-  }
 
-  // Eseményfigyelők a letöltő linkekhez
-  document.querySelectorAll('.download-link').forEach(link => {
-    link.addEventListener('click', (event) => {
-      const fileName = link.getAttribute('data-filename') || link.innerText.trim();
-      const fileUrl = link.href;
-      logDownload(fileName, fileUrl);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const db = getFirestore(app);
+
+    // DOM elemek
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userInfo = document.getElementById('userInfo');
+    const downloadsCard = document.getElementById('downloadsCard');
+
+    // Felhasználó állapot figyelése
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'inline-flex';
+        userInfo.style.display = 'inline-block';
+        userInfo.innerHTML = `👋 Üdv, ${user.displayName || user.email}!`;
+        downloadsCard.style.display = 'block';
+
+        // Felhasználói dokumentum létrehozása a Firestore-ban (ha még nincs)
+        const userRef = doc(db, 'users', user.uid);
+        try {
+          await setDoc(userRef, {
+            email: user.email,
+            name: user.displayName,
+            lastLogin: serverTimestamp(),
+            downloads: []
+          }, { merge: true });
+          console.log("✅ Felhasználó dokumentum sikeresen elmentve");
+        } catch (error) {
+          console.error("❌ Hiba a dokumentum mentésekor:", error);
+          userInfo.innerHTML = `⚠️ Adatbázis hiba: ${error.message}`;
+        }
+      } else {
+        loginBtn.style.display = 'inline-flex';
+        logoutBtn.style.display = 'none';
+        userInfo.style.display = 'none';
+        userInfo.innerHTML = '';
+        downloadsCard.style.display = 'none';
+      }
     });
-  });
-</script>
+
+    loginBtn.onclick = () => signInWithPopup(auth, provider);
+    logoutBtn.onclick = () => auth.signOut();
+
+    // Letöltés naplózása
+    async function logDownload(fileName, fileUrl) {
+      const user = auth.currentUser;
+      if (!user) return;
+      const userRef = doc(db, 'users', user.uid);
+      const downloadEntry = {
+        fileName: fileName,
+        url: fileUrl,
+        downloadedAt: serverTimestamp()
+      };
+      try {
+        await updateDoc(userRef, {
+          downloads: arrayUnion(downloadEntry)
+        });
+        console.log(`📥 Letöltés naplózva: ${fileName}`);
+      } catch (error) {
+        console.error("Naplózási hiba:", error);
+      }
+    }
+
+    // Eseményfigyelők a letöltő linkekhez
+    document.querySelectorAll('.download-link').forEach(link => {
+      link.addEventListener('click', (event) => {
+        const fileName = link.getAttribute('data-filename') || link.innerText.trim();
+        const fileUrl = link.href;
+        logDownload(fileName, fileUrl);
+      });
+    });
+  </script>
+</body>
+</html>
