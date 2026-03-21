@@ -1,10 +1,11 @@
-s<!DOCTYPE html>
-<html lang="hu">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NΞXUS</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg: #0a0a14;
@@ -12,79 +13,47 @@ s<!DOCTYPE html>
       --border: rgba(255,255,255,.12);
       --gold: #d4a017;
       --purple: #8a5af8;
-      --purple-dark: #6a3bdc;
       --text: #fff;
       --muted: #bbb;
-      --overlay: rgba(255,255,255,.08);
     }
 
-    /* Reset alapok */
     * { box-sizing: border-box; }
-    html, body { height: 100%; }
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto;
+      font-family: Inter, sans-serif;
       color: var(--text);
       background: linear-gradient(135deg, rgba(18,12,38,.95) 0%, rgba(7,5,15,.95) 60%), #0a0a14;
       overflow-x: hidden;
     }
 
-    /* Háttér effektus – villám + füst (CSS) */
+    /* háttér */
     .bg {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: radial-gradient(circle at 20% 20%, rgba(140,0,255,.08), transparent 40%);
     }
-    .lightning {
-      position: absolute; width: 2px; height: 120vh;
-      left: 12%; top: -10vh;
-      background: linear-gradient(#fff, transparent 60%);
-      opacity: .25; filter: drop-shadow(0 0 8px rgba(180,190,255,.9));
-      transform: skewX(-2deg);
-      animation: strike 2s linear infinite;
-    }
-    @keyframes strike {
-      0%,100% { transform: translateX(0); opacity:.25; }
-      50% { transform: translateX(-10px); opacity:.9; }
-    }
-    .smoke {
-      position: absolute; width: 180px; height: 180px;
-      right: -40px; bottom: -40px;
-      background: radial-gradient(circle at 40% 40%, rgba(255,255,255,.22), transparent 40%);
-      filter: blur(40px); opacity:.25;
-      border-radius: 50%;
-      animation: drift 12s linear infinite;
-    }
-    @keyframes drift {
-      0% { transform: translate(0,0); }
-      50% { transform: translate(-40px,-20px); opacity:.35; }
-      100% { transform: translate(0,0); opacity:.25; }
-    }
 
     header {
-      position: relative;
       text-align: center; padding: 110px 20px 40px;
-      z-index: 1;
+      position: relative; z-index: 1;
     }
 
-    /* profilkép + név a fejben */
     .brand {
       display: inline-flex; align-items: center; gap: 16px;
       justify-content: center; margin-bottom: 8px;
     }
+
     .avatar {
-      width: 110px; height: 110px; border-radius: 50%;
+      width: 110px; height: 110px;
+      border-radius: 50%;
       border: 2px solid rgba(255,255,255,.25);
-      box-shadow: 0 8px 26px rgba(0,0,0,.4);
       object-fit: cover;
-      background: #222;
     }
+
     .brand-name {
-      font-family: Montserrat, sans-serif;
-      font-weight: 800; letter-spacing: 6px;
-      color: #fff;
+      font-weight: 800;
+      letter-spacing: 6px;
       font-size: 28px;
     }
-    .brand-name span { color: var(--purple); }
 
     h1 {
       color: var(--gold);
@@ -92,146 +61,187 @@ s<!DOCTYPE html>
       letter-spacing: 6px;
       margin: 6px 0 4px;
     }
+
     .subtitle { color: var(--muted); }
 
     .container {
       max-width: 1100px;
-      margin: 0 auto; padding: 0 20px 60px; position: relative; z-index: 1;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+      position: relative;
+      z-index: 1;
     }
 
     .grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
     }
+
     .box {
       background: rgba(20,20,28,.98);
       border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px; padding: 22px;
-      transition: transform .2s ease, box-shadow .2s ease;
-      box-shadow: 0 20px 40px rgba(0,0,0,.25);
+      border-radius: 14px;
+      padding: 22px;
+      transition: 0.2s;
     }
-    .box:hover { transform: translateY(-4px); box-shadow: 0 28px 60px rgba(0,0,0,.35); }
 
-    .box h2 { color: var(--gold); font-size: 22px; margin-bottom: 8px; }
+    .box:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,.3);
+    }
+
+    .box h2 { color: var(--gold); }
 
     .btn {
-      display: inline-block; padding: 12px 22px;
+      display: inline-block;
+      padding: 12px 22px;
       border: 1px solid var(--purple);
-      color: #d9d4ff; text-decoration: none;
-      border-radius: 8px; font-weight: 600;
-      transition: all .15s ease;
+      color: #d9d4ff;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-top: 10px;
     }
-    .btn:hover { background: var(--purple); color: white; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
-    th, td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,.08); text-align: left; }
-    th { color: #e9e9e9; font-weight: 500; }
+    .btn:hover {
+      background: var(--purple);
+      color: white;
+    }
+
+    table { width: 100%; margin-top: 10px; }
+    th, td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,.08); }
+
     .download-btn {
-      display: inline-block; padding: 6px 12px;
-      border: 1px solid #a06cff; color: #a06cff; text-decoration: none;
+      padding: 6px 12px;
+      border: 1px solid #a06cff;
+      color: #a06cff;
+      text-decoration: none;
       border-radius: 6px;
-      transition: background-color .2s ease, color .2s ease;
     }
-    .download-btn:hover { background: #a06cff; color: white; }
 
-    /* License panel */
-    .license { position: fixed; left:0; right:0; bottom:0; background:#0b0b0b; border-top:1px solid rgba(255,255,255,.08); z-index: 3; }
-    .license-header { text-align:center; padding:12px; cursor:pointer; color:#ffd9a8; user-select:none; }
-    .license-content { display:none; padding:14px 16px; color:#ddd; font-size:14px; }
+    .download-btn:hover {
+      background: #a06cff;
+      color: white;
+    }
 
-    /* Responsive */
-    @media (max-width: 900px) {
+    /* LICENSE */
+    .license {
+      position: fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      background: rgba(10,10,10,0.95);
+      border-top: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(8px);
+      z-index: 3;
+    }
+
+    .license-header {
+      text-align:center;
+      padding:14px;
+      cursor:pointer;
+      color: #ffd9a8;
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+
+    .license-header:hover {
+      background: rgba(138,90,248,0.15);
+    }
+
+    .license-content {
+      display:none;
+      padding:18px;
+      color:#ddd;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    @media(max-width:900px){
       .grid { grid-template-columns: 1fr; }
-      h1 { font-size: 54px; }
-    }
-    @media (max-width: 420px) {
-      .avatar { width: 96px; height: 96px; }
-      h1 { font-size: 46px; }
     }
   </style>
 
   <script>
     function toggleLicense() {
       var content = document.getElementById("licenseContent");
-      var visible = content.style.display === "block";
-      content.style.display = visible ? "none" : "block";
-      document.getElementById("licenseToggle").setAttribute("aria-expanded", String(!visible));
-      content.setAttribute("aria-hidden", String(visible));
+      content.style.display = content.style.display === "block" ? "none" : "block";
     }
   </script>
 </head>
+
 <body>
 
-  <div class="bg" aria-hidden="true">
-    <div class="lightning" style="left:12%;"></div>
-    <div class="lightning" style="left:34%; height:140vh; width:2px;"></div>
-    <div class="smoke"></div>
+<div class="bg"></div>
+
+<header>
+  <div class="brand">
+    <img class="avatar" src="Nexusprofile.png">
+    <div class="brand-name">NΞXUS</div>
   </div>
 
-  <header>
-    <!-- Profilkép (GitHub-ról feltöltött PNG) -->
-    <div class="brand" aria-label="Profilkép">
-      <img class="avatar" src="Nexusprofile.png" alt="NΞXUS profilkép">
-      <div class="brand-name" title="NΞXUS">
-        NΞX<span>US</span>
-      </div>
+  <h1>NΞXUS</h1>
+  <div class="subtitle">Gaming • Programs • Innovative Tech</div>
+</header>
+
+<main class="container">
+  <section class="grid">
+
+    <div class="box">
+      <h2>Community</h2>
+      <p>Join the NΞXUS Discord community.</p>
+
+      <a class="btn" href="https://discord.gg/vdmzkXfefU" target="_blank">
+        Join Discord
+      </a>
+
+      <br>
+
+      <a class="btn" href="www.youtube.com/channel/UCCHUo4oRYy2uYM8mnD_X-zg/" target="_blank">
+        YouTube Channel
+      </a>
     </div>
 
-    <h1>NΞXUS</h1>
-    <div class="subtitle">Gaming • Programs • Innovative Tech</div>
-  </header>
+    <div class="box">
+      <h2>Downloads</h2>
 
-  <main class="container" role="main" aria-label="Főtartalom">
-    <section class="grid" aria-labelledby="community-title">
-      <div class="box" id="community-title" aria-labelledby="community-title">
-        <h2>Community</h2>
-        <p>Csatlakozz a NΞXUS Discord szerveréhez.</p>
-        <a class="btn" href="https://discord.gg/vdmzkXfefU" target="_blank" rel="noopener">
-          Join Discord
-        </a>
-      </div>
+      <table>
+        <tr>
+          <th>Date</th>
+          <th>File</th>
+          <th></th>
+        </tr>
 
-      <div class="box" aria-labelledby="downloads-title">
-        <h2 id="downloads-title">Downloads</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>File</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>2026-03-20</td>
-              <td>TEST BUTTON<br><small>0 MB</small></td>
-              <td><a class="download-btn" href="files/program1.zip" download>Download</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <div class="license" aria-label="Licenc panel">
-    <div class="license-header" id="licenseToggle" onclick="toggleLicense()" role="button" aria-expanded="false">
-      LICENSE ▼
+        <tr>
+          <td>2026-03-20</td>
+          <td>TEST BUTTON<br><small>0 MB</small></td>
+          <td><a class="download-btn" href="files/program1.zip">Download</a></td>
+        </tr>
+      </table>
     </div>
-    <div class="license-content" id="licenseContent" aria-hidden="true">
-      <p>All content on this site (programs, files, fake viruses) is created for educational and entertainment purposes only.
-     </p>
 
-    <p>By downloading anything, you agree:
-    </p>
-  <ul>
-    <li>Not to use it for real harm</li>
-    <li>Not to redistribute without permission</li>
-    <li>Use at your own risk</li>
-  </ul>
-<p>
-NΞXUS is not responsible for any damage caused.
-</p>
-    </div>
+  </section>
+</main>
+
+<div class="license">
+  <div class="license-header" onclick="toggleLicense()">
+    LICENSE ▼
   </div>
+
+  <div class="license-content" id="licenseContent">
+    <p>All content on this site (programs, files, fake viruses) is created for educational and entertainment purposes only.</p>
+
+    <p>By downloading anything, you agree:</p>
+
+    <ul>
+      <li>Not to use it for real harm</li>
+      <li>Not to redistribute without permission</li>
+      <li>Use at your own risk</li>
+    </ul>
+
+    <p>NΞXUS is not responsible for any damage caused.</p>
+  </div>
+</div>
 
 </body>
 </html>
