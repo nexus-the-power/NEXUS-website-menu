@@ -580,8 +580,7 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  window.firebaseAuth = auth;
+  const auth = getAuth(app);window.firebaseAuth = auth;
   const provider = new GoogleAuthProvider();
   const db = getFirestore(app);   // <-- Firestore inicializálása
 
@@ -654,7 +653,7 @@
     });
   });
 </script>
-
+  <script>
   // 🔽 A TE FIREBASE KONFIGURÁCIÓD (a nexus-67676 projekthez)
   const firebaseConfig = {
     apiKey: "AIzaSyDW0lUVCf0N8VmLwmlnyoc2GAdW6llHuKs",
