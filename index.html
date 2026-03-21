@@ -2,15 +2,16 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NΞXUS — lightning core</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <!-- Firebase globális SDK (nem moduláris) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --bg-deep: #03030c;
@@ -33,7 +34,6 @@
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--text-light);
       line-height: 1.5;
-      scroll-behavior: smooth;
       min-height: 100vh;
       position: relative;
     }
@@ -58,13 +58,13 @@
     }
 
     .bolt {
-      transform: translateZ(0);
-      backface-visibility: hidden;
       position: absolute;
       background: linear-gradient(135deg, #b77cff, #5f2eff);
       filter: blur(18px);
       opacity: 0.4;
       animation: pulseGlow 6s infinite alternate;
+      transform: translateZ(0);  /* csökkenti a fehér vonalat */
+      backface-visibility: hidden;
     }
 
     .bolt1 {
@@ -155,31 +155,18 @@
       padding: 2rem 1.5rem 5rem;
     }
 
-    .hero {
-      text-align: center;
-      margin: 2rem 0 3rem 0;
-    }
-
-    .avatar-frame {
-      display: inline-block;
-      position: relative;
-    }
-
+    .hero { text-align: center; margin: 2rem 0 3rem 0; }
+    .avatar-frame { display: inline-block; position: relative; }
     .avatar {
       width: 120px;
       height: 120px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid rgba(255, 215, 120, 0.6);
-      box-shadow: 0 0 20px rgba(212, 160, 23, 0.4), 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 20px rgba(212, 160, 23, 0.4);
       transition: var(--transition);
     }
-
-    .avatar:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 30px rgba(212, 160, 23, 0.7);
-    }
-
+    .avatar:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(212, 160, 23, 0.7); }
     .brand {
       margin-top: 1rem;
       font-size: 1.5rem;
@@ -191,7 +178,6 @@
       -webkit-background-clip: text;
       color: transparent;
     }
-
     h1 {
       font-size: clamp(3rem, 12vw, 5.8rem);
       font-weight: 800;
@@ -200,17 +186,14 @@
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
-      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       margin: 0.5rem 0 0.2rem;
     }
-
     .sub {
       color: var(--text-muted);
       font-size: 1.1rem;
       border-bottom: 1px dashed rgba(212, 160, 23, 0.4);
       display: inline-block;
       padding-bottom: 6px;
-      backdrop-filter: blur(2px);
     }
 
     .grid-2 {
@@ -225,15 +208,13 @@
       backdrop-filter: blur(12px);
       border: 1px solid var(--glass-border);
       border-radius: 2rem;
-      padding: 1.8rem 1.8rem 2.2rem;
+      padding: 1.8rem;
       transition: var(--transition);
       box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
     }
-
     .glass-card:hover {
       transform: translateY(-6px);
       border-color: rgba(212, 160, 23, 0.5);
-      box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(212, 160, 23, 0.2);
     }
 
     .card-header {
@@ -244,11 +225,9 @@
       border-left: 3px solid var(--gold-primary);
       padding-left: 1rem;
     }
-
     .card-header h2 {
       font-size: 1.8rem;
       font-weight: 700;
-      letter-spacing: -0.3px;
       background: linear-gradient(145deg, #ffffff, #e2ca86);
       background-clip: text;
       -webkit-background-clip: text;
@@ -278,15 +257,10 @@
       font-size: 0.9rem;
       cursor: pointer;
     }
-
-    .btn i { font-style: normal; font-weight: 600; }
-
     .btn:hover {
       background: var(--purple-dark);
       border-color: var(--gold-primary);
-      color: white;
       box-shadow: 0 0 12px rgba(124, 58, 255, 0.6);
-      transform: scale(0.98);
     }
 
     .downloads-table {
@@ -295,41 +269,13 @@
       border-collapse: separate;
       border-spacing: 0 10px;
     }
-
     .downloads-table tr {
       background: rgba(10, 10, 20, 0.6);
       border-radius: 18px;
-      transition: 0.2s;
     }
-
     .downloads-table td {
       padding: 12px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      vertical-align: middle;
     }
-
-    .file-name {
-      font-weight: 600;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .file-name small {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      font-weight: normal;
-    }
-
-    .date-badge {
-      font-family: monospace;
-      font-size: 0.8rem;
-      background: rgba(212, 160, 23, 0.15);
-      padding: 4px 10px;
-      border-radius: 40px;
-      display: inline-block;
-      width: fit-content;
-    }
-
     .download-link {
       background: none;
       border: 1px solid var(--purple-neon);
@@ -338,17 +284,35 @@
       border-radius: 30px;
       text-decoration: none;
       font-size: 0.8rem;
-      font-weight: 500;
       transition: 0.2s;
-      display: inline-block;
     }
-
     .download-link:hover {
       background: var(--purple-neon);
       color: #0a0a14;
-      box-shadow: 0 0 8px #b77cff;
     }
 
+    .license-footer {
+      margin-top: 4rem;
+      background: rgba(5, 5, 12, 0.75);
+      backdrop-filter: blur(8px);
+      border-radius: 2rem;
+      overflow: hidden;
+    }
+    .license-toggle {
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.4);
+      color: #f5d793;
+      display: flex;
+      justify-content: space-between;
+    }
+    .license-content {
+      display: none;
+      padding: 1.2rem 1.8rem;
+      color: #cbcbe6;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 215, 0, 0.15);
+    }
     .info-note {
       font-size: 0.75rem;
       text-align: center;
@@ -357,111 +321,11 @@
       border-top: 1px dashed rgba(255,255,255,0.1);
       padding-top: 1rem;
     }
-
-    .license-footer {
-      margin-top: 4rem;
-      background: rgba(5, 5, 12, 0.75);
-      backdrop-filter: blur(8px);
-      border-radius: 2rem;
-      border: 1px solid rgba(212, 160, 23, 0.2);
-      overflow: hidden;
-      transition: 0.2s;
-    }
-
-    .license-toggle {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 1rem 1.5rem;
-      cursor: pointer;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #f5d793;
-      user-select: none;
-    }
-
-    .license-toggle span:first-child {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .license-toggle:hover {
-      background: rgba(138, 90, 248, 0.2);
-    }
-
-    .license-content {
-      display: none;
-      padding: 1.2rem 1.8rem;
-      color: #cbcbe6;
-      font-size: 0.85rem;
-      line-height: 1.6;
-      border-top: 1px solid rgba(255, 215, 0, 0.15);
-    }
-
-    .license-content ul {
-      margin: 0.8rem 0 0.5rem 1.5rem;
-    }
-
-    .license-content li {
-      margin: 0.3rem 0;
-    }
-
-    /* bejelentkezési státusz sáv */
-    .auth-status {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    #userInfo {
-      background: rgba(0,0,0,0.4);
-      padding: 6px 12px;
-      border-radius: 40px;
-      display: inline-block;
-      font-size: 0.85rem;
-    }
-
     @media (max-width: 700px) {
-      .wrapper {
-        padding: 1.5rem 1rem 3rem;
-      }
-      .glass-card {
-        padding: 1.5rem;
-      }
-      .btn-group {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .btn {
-        justify-content: center;
-      }
-      .downloads-table td {
-        display: block;
-        width: 100%;
-        padding: 6px 4px;
-      }
-      .downloads-table tr {
-        display: block;
-        margin-bottom: 1rem;
-        padding: 8px;
-        border-radius: 18px;
-      }
-      .date-badge {
-        display: inline-block;
-        margin-bottom: 5px;
-      }
-    }
-
-    ::-webkit-scrollbar {
-      width: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #050510;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #d4a017;
-      border-radius: 10px;
+      .wrapper { padding: 1.5rem 1rem; }
+      .btn-group { flex-direction: column; }
+      .downloads-table td { display: block; width: 100%; }
+      .downloads-table tr { display: block; margin-bottom: 1rem; padding: 8px; }
     }
   </style>
 </head>
@@ -471,17 +335,15 @@
   <div class="bolt bolt1"></div>
   <div class="bolt bolt2"></div>
   <div class="bolt bolt3"></div>
-  <div class="spark" style="top: 15%; left: 45%; animation-delay: 0s;"></div>
+  <div class="spark" style="top: 15%; left: 45%;"></div>
   <div class="spark" style="top: 65%; left: 80%; animation-delay: 1.2s;"></div>
   <div class="spark" style="top: 35%; left: 10%; animation-delay: 2.5s;"></div>
-  <div class="spark" style="top: 85%; left: 55%; animation-delay: 0.7s;"></div>
-  <div class="spark" style="top: 50%; left: 25%; animation-delay: 1.9s;"></div>
 </div>
 
 <div class="wrapper">
   <div class="hero">
     <div class="avatar-frame">
-      <img class="avatar" src="Nexusprofile.png" alt="NΞXUS avatar" onerror="this.src='https://placehold.co/120x120/1e1a2e/ffd966?text=NX'">
+      <img class="avatar" src="Nexusprofile.png" alt="NEXUS" onerror="this.src='https://placehold.co/120x120/1e1a2e/ffd966?text=NX'">
     </div>
     <div class="brand">NΞXUS COLLECTIVE</div>
     <h1>NΞXUS</h1>
@@ -489,88 +351,61 @@
   </div>
 
   <!-- Bejelentkezési kártya -->
-  <div class="glass-card" style="text-align: center; margin-bottom: 2rem;">
+  <div class="glass-card" style="text-align: center;">
     <div class="btn-group" style="justify-content: center;">
       <button id="loginBtn" class="btn">🔐 Google bejelentkezés</button>
       <button id="logoutBtn" class="btn" style="display: none;">🚪 Kijelentkezés</button>
     </div>
-    <div id="userInfo" style="display: none;"></div>
+    <div id="userInfo" style="display: none; margin-top: 10px;"></div>
   </div>
 
   <div class="grid-2">
-    <!-- COMMUNITY kártya (mindig látható) -->
+    <!-- COMMUNITY -->
     <div class="glass-card">
-      <div class="card-header">
-        <h2>✦ COMMUNITY</h2>
-      </div>
-      <p style="margin-bottom: 0.5rem;">Join the inner circle — Discord hub, latest updates, and exclusive content.</p>
+      <div class="card-header"><h2>✦ COMMUNITY</h2></div>
+      <p>Join the inner circle — Discord hub, latest updates, and exclusive content.</p>
       <div class="btn-group">
-        <a class="btn" href="https://discord.gg/vdmzkXfefU" target="_blank">
-          <i>🎧</i> Join Discord
-        </a>
-        <a class="btn" href="https://www.youtube.com/channel/UCCHUo4oRYy2uYM8mnD_X-zg" target="_blank">
-          <i>📺</i> YouTube
-        </a>
+        <a class="btn" href="https://discord.gg/vdmzkXfefU" target="_blank">🎧 Join Discord</a>
+        <a class="btn" href="https://www.youtube.com/channel/UCCHUo4oRYy2uYM8mnD_X-zg" target="_blank">📺 YouTube</a>
       </div>
-      <div class="info-note">
-        ⚡ active events · giveaways · early access
-      </div>
+      <div class="info-note">⚡ active events · giveaways · early access</div>
     </div>
 
-    <!-- DOWNLOADS kártya (csak bejelentkezés után látható) -->
+    <!-- DOWNLOADS (csak bejelentkezés után látszik) -->
     <div id="downloadsCard" class="glass-card" style="display: none;">
-      <div class="card-header">
-        <h2>⬇ DOWNLOADS</h2>
-      </div>
-      <p>Tools, experiments & educational resources. <br> <span style="font-size: 0.8rem; color: var(--text-muted);">🔒 All files hosted on GitHub — use responsibly.</span></p>
-
+      <div class="card-header"><h2>⬇ DOWNLOADS</h2></div>
+      <p>Tools, experiments & educational resources.</p>
       <table class="downloads-table">
         <tbody>
           <tr>
-            <td><span class="date-badge">2026-03-20</span></td>
-            <td>
-              <div class="file-name">Nexus_Launcher_Beta.zip 
-                <small>0 MB • cross-platform</small>
-              </div>
-            </td>
-            <td style="text-align: right;">
-              <a class="download-link" href="https://github.com/NEXUS-crypto-cloud/nexus-site/blob/main/nexus_launcher.py" target="_blank">↓ Get</a>
-            </td>
+            <td>2026-03-21</td>
+            <td><strong>TEST_BUTTON_V1.rar</strong><br><small>0 MB</small></td>
+            <td><a class="download-link" href="https://github.com/NEXUS-crypto-cloud/nexus-site/raw/refs/heads/main/TEST_BUTTON_V1.rar" data-filename="TEST_BUTTON_V1.rar" target="_blank">↓ Letöltés</a></td>
+          </tr>
+          <tr>
+            <td>2026-03-20</td>
+            <td><strong>Nexus_Launcher_Beta.zip</strong><br><small>2.4 MB</small></td>
+            <td><a class="download-link" href="https://github.com/NEXUS-crypto-cloud/nexus-site/raw/refs/heads/main/Nexus_Launcher_Beta.zip" data-filename="Nexus_Launcher_Beta.zip" target="_blank">↓ Letöltés</a></td>
           </tr>
         </tbody>
       </table>
-      <div class="info-note">
-        💡 A letöltési előzmények a Firebase-ben tárolódnak – a későbbi Nexus Launcher is ezt használja.
-      </div>
     </div>
   </div>
 
   <div class="license-footer">
-    <div class="license-toggle" onclick="toggleLicensePanel()">
+    <div class="license-toggle" onclick="toggleLicense()">
       <span>⚖️ LICENSE & TERMS</span>
       <span id="licenseArrow">▼</span>
     </div>
     <div class="license-content" id="licensePanel">
       <p><strong>NΞXUS Educational & Entertainment License v1.0</strong></p>
-      <p>All content published on this website (programs, scripts, "fake viruses", binaries, demos) is created strictly for <strong>educational, research, and entertainment purposes</strong>. By downloading or using any file, you agree to the following terms:</p>
-      <ul>
-        <li>You will NOT use any material to cause real harm, damage, or malicious activity.</li>
-        <li>You will NOT redistribute modified or original versions without explicit written permission.</li>
-        <li>All files are provided “AS IS”, without warranty of any kind. The NΞXUS collective is not liable for any misuse, data loss, or system damage.</li>
-        <li>You must be at least 13 years old to access downloads (or comply with your local laws).</li>
-      </ul>
-      <p>For commercial inquiries or redistribution requests, contact us via Discord. <br> ⚡ NΞXUS — where innovation meets responsibility.</p>
+      <p>All content is created for educational and entertainment purposes. By downloading you agree to the terms: no malicious use, no redistribution without permission, use at your own risk.</p>
     </div>
   </div>
 </div>
 
-<!-- Firebase modulok és logika -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-  // 🔥 A TE FIREBASE KONFIGURÁCIÓD (nexus-67676)
+<script>
+  // Firebase konfiguráció (globális SDK)
   const firebaseConfig = {
     apiKey: "AIzaSyDW0lUVCf0N8VmLwmlnyoc2GAdW6llHuKs",
     authDomain: "nexus-67676.firebaseapp.com",
@@ -581,128 +416,42 @@
     measurementId: "G-C9CPN7FEP4"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  window.firebaseAuth = auth;
-  const provider = new GoogleAuthProvider();
-  const db = getFirestore(app);   // <-- Firestore inicializálása
+  // Inicializálás (globális)
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
 
   const loginBtn = document.getElementById('loginBtn');
   const logoutBtn = document.getElementById('logoutBtn');
   const userInfo = document.getElementById('userInfo');
   const downloadsCard = document.getElementById('downloadsCard');
 
-  // Felhasználó állapotának figyelése
-  onAuthStateChanged(auth, async (user) => {
+  // Állapotfigyelés
+  auth.onAuthStateChanged((user) => {
     if (user) {
       loginBtn.style.display = 'none';
       logoutBtn.style.display = 'inline-flex';
       userInfo.style.display = 'inline-block';
       userInfo.innerHTML = `👋 Üdv, ${user.displayName || user.email}!`;
       downloadsCard.style.display = 'block';
-
-      // 🔽 Létrehozzuk a felhasználó dokumentumát a Firestore-ban (ha még nincs)
-      const userRef = doc(db, 'users', user.uid);
-      try {
-        await setDoc(userRef, {
-          email: user.email,
-          name: user.displayName,
-          lastLogin: serverTimestamp(),
-          downloads: []
-        }, { merge: true });
-        console.log("✅ Felhasználó dokumentum sikeresen elmentve");
-      } catch (error) {
-        console.error("❌ Hiba a dokumentum mentésekor:", error);
-        userInfo.innerHTML = `⚠️ Adatbázis hiba: ${error.message}`;
-      }
     } else {
       loginBtn.style.display = 'inline-flex';
       logoutBtn.style.display = 'none';
       userInfo.style.display = 'none';
-      userInfo.innerHTML = '';
       downloadsCard.style.display = 'none';
     }
   });
 
-  loginBtn.onclick = () => signInWithPopup(auth, provider);
-  logoutBtn.onclick = () => signOut(auth);
-
-  // Naplózás funkció
-  async function logDownload(fileName, fileUrl) {
-    const user = auth.currentUser;
-    if (!user) return;
-    const userRef = doc(db, 'users', user.uid);
-    const downloadEntry = {
-      fileName: fileName,
-      url: fileUrl,
-      downloadedAt: serverTimestamp()
-    };
-    try {
-      await updateDoc(userRef, {
-        downloads: arrayUnion(downloadEntry)
-      });
-      console.log(`📥 Letöltés naplózva: ${fileName}`);
-    } catch (error) {
-      console.error("Naplózási hiba:", error);
-    }
-  }
-
-  // Eseményfigyelők a letöltő linkekhez
-  document.querySelectorAll('.download-link').forEach(link => {
-    link.addEventListener('click', (event) => {
-      const fileName = link.getAttribute('data-filename') || link.innerText.trim();
-      const fileUrl = link.href;
-      logDownload(fileName, fileUrl);
+  loginBtn.onclick = () => {
+    auth.signInWithPopup(provider).catch((error) => {
+      console.error("Bejelentkezési hiba:", error);
+      userInfo.innerHTML = `⚠️ Hiba: ${error.message}`;
     });
-  });
-</script>
-  <script>
-  // 🔽 A TE FIREBASE KONFIGURÁCIÓD (a nexus-67676 projekthez)
-  const firebaseConfig = {
-    apiKey: "AIzaSyDW0lUVCf0N8VmLwmlnyoc2GAdW6llHuKs",
-    authDomain: "nexus-67676.firebaseapp.com",
-    projectId: "nexus-67676",
-    storageBucket: "nexus-67676.firebasestorage.app",
-    messagingSenderId: "640354273542",
-    appId: "1:640354273542:web:128bbc9ce5eb9e09557687",
-    measurementId: "G-C9CPN7FEP4"
   };
+  logoutBtn.onclick = () => auth.signOut();
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-
-  // DOM elemek
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const userInfo = document.getElementById('userInfo');
-  const downloadsCard = document.getElementById('downloadsCard');
-
-  // Felhasználó állapotának figyelése
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // bejelentkezett állapot
-      loginBtn.style.display = 'none';
-      logoutBtn.style.display = 'inline-flex';
-      userInfo.style.display = 'inline-block';
-      userInfo.innerHTML = `👋 Üdv, ${user.displayName || user.email}!`;
-      downloadsCard.style.display = 'block';   // megjelenik a letöltési kártya
-    } else {
-      // kijelentkezett állapot
-      loginBtn.style.display = 'inline-flex';
-      logoutBtn.style.display = 'none';
-      userInfo.style.display = 'none';
-      userInfo.innerHTML = '';
-      downloadsCard.style.display = 'none';    // elrejtjük a letöltési kártyát
-    }
-  });
-
-  loginBtn.onclick = () => signInWithPopup(auth, provider);
-  logoutBtn.onclick = () => signOut(auth);
-</script>
-
-<script>
-  function toggleLicensePanel() {
+  // Licensz toggle
+  function toggleLicense() {
     const panel = document.getElementById('licensePanel');
     const arrow = document.getElementById('licenseArrow');
     if (panel.style.display === 'none' || panel.style.display === '') {
@@ -713,13 +462,7 @@
       arrow.innerHTML = '▼';
     }
   }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const panel = document.getElementById('licensePanel');
-    if (panel) panel.style.display = 'none';
-  });
+  document.getElementById('licensePanel').style.display = 'none';
 </script>
 </body>
 </html>
-
-<script type="module">
