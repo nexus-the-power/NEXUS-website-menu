@@ -38,7 +38,7 @@
       position: relative;
     }
 
-    /* ---------- LIGHTNING BACKGROUND (lila villám, profilképre utalva) ---------- */
+    /* ---------- LIGHTNING BACKGROUND ---------- */
     .lightning-bg {
       position: fixed;
       top: 0;
@@ -50,7 +50,6 @@
       overflow: hidden;
     }
 
-    /* alap réteg: sötét, finom gradiensek */
     .lightning-bg::before {
       content: "";
       position: absolute;
@@ -58,7 +57,6 @@
       background: radial-gradient(circle at 70% 30%, rgba(80, 30, 150, 0.2) 0%, transparent 60%);
     }
 
-    /* villám 1 (stilizált, bal felső) */
     .bolt {
       position: absolute;
       background: linear-gradient(135deg, #b77cff, #5f2eff);
@@ -90,7 +88,6 @@
       animation: floatLightning2 18s infinite alternate;
     }
 
-    /* kisebb, élesebb villámcsapás effekt (dinamikus) */
     .bolt3 {
       position: absolute;
       top: 40%;
@@ -104,7 +101,6 @@
       animation: flicker 3.5s infinite alternate, drift 12s infinite alternate;
     }
 
-    /* villám "szikrák" */
     .spark {
       position: absolute;
       width: 4px;
@@ -157,7 +153,6 @@
       padding: 2rem 1.5rem 5rem;
     }
 
-    /* header / hero */
     .hero {
       text-align: center;
       margin: 2rem 0 3rem 0;
@@ -216,7 +211,6 @@
       backdrop-filter: blur(2px);
     }
 
-    /* grid kártyák */
     .grid-2 {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -280,6 +274,7 @@
       text-decoration: none;
       transition: var(--transition);
       font-size: 0.9rem;
+      cursor: pointer;
     }
 
     .btn i { font-style: normal; font-weight: 600; }
@@ -292,7 +287,6 @@
       transform: scale(0.98);
     }
 
-    /* downloads table modern */
     .downloads-table {
       width: 100%;
       margin-top: 1rem;
@@ -353,7 +347,6 @@
       box-shadow: 0 0 8px #b77cff;
     }
 
-    /* extra info */
     .info-note {
       font-size: 0.75rem;
       text-align: center;
@@ -363,7 +356,6 @@
       padding-top: 1rem;
     }
 
-    /* license footer */
     .license-footer {
       margin-top: 4rem;
       background: rgba(5, 5, 12, 0.75);
@@ -412,6 +404,20 @@
 
     .license-content li {
       margin: 0.3rem 0;
+    }
+
+    /* bejelentkezési státusz sáv */
+    .auth-status {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    #userInfo {
+      background: rgba(0,0,0,0.4);
+      padding: 6px 12px;
+      border-radius: 40px;
+      display: inline-block;
+      font-size: 0.85rem;
     }
 
     @media (max-width: 700px) {
@@ -480,7 +486,17 @@
     <div class="sub">Gaming • Programs • Innovative Tech</div>
   </div>
 
+  <!-- Bejelentkezési kártya -->
+  <div class="glass-card" style="text-align: center; margin-bottom: 2rem;">
+    <div class="btn-group" style="justify-content: center;">
+      <button id="loginBtn" class="btn">🔐 Google bejelentkezés</button>
+      <button id="logoutBtn" class="btn" style="display: none;">🚪 Kijelentkezés</button>
+    </div>
+    <div id="userInfo" style="display: none;"></div>
+  </div>
+
   <div class="grid-2">
+    <!-- COMMUNITY kártya (mindig látható) -->
     <div class="glass-card">
       <div class="card-header">
         <h2>✦ COMMUNITY</h2>
@@ -499,7 +515,8 @@
       </div>
     </div>
 
-    <div class="glass-card">
+    <!-- DOWNLOADS kártya (csak bejelentkezés után látható) -->
+    <div id="downloadsCard" class="glass-card" style="display: none;">
       <div class="card-header">
         <h2>⬇ DOWNLOADS</h2>
       </div>
@@ -508,18 +525,32 @@
       <table class="downloads-table">
         <tbody>
           <tr>
-            <td><span class="date-badge">2026-03-18</span></td>
+            <td><span class="date-badge">2026-03-21</span></td>
+            <td>
+              <div class="file-name">TEST_BUTTON_V1.rar 
+                <small>0 MB • demo</small>
+              </div>
+            </td>
+            <td style="text-align: right;">
+              <a class="download-link" href="https://github.com/NEXUS-crypto-cloud/nexus-site/raw/refs/heads/main/TEST_BUTTON_V1.rar" target="_blank">↓ Get</a>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="date-badge">2026-03-20</span></td>
             <td>
               <div class="file-name">Nexus_Launcher_Beta.zip 
                 <small>2.4 MB • cross-platform</small>
               </div>
             </td>
             <td style="text-align: right;">
-              <a class="download-link" href="https://github.com/yourusername/nexus-repo/releases/download/beta/nexus_launcher.zip" target="_blank">↓ Get</a>
+              <a class="download-link" href="https://github.com/NEXUS-crypto-cloud/nexus-site/raw/refs/heads/main/Nexus_Launcher_Beta.zip" target="_blank">↓ Get</a>
             </td>
           </tr>
         </tbody>
       </table>
+      <div class="info-note">
+        💡 A letöltési előzmények a Firebase-ben tárolódnak – a későbbi Nexus Launcher is ezt használja.
+      </div>
     </div>
   </div>
 
@@ -541,6 +572,55 @@
     </div>
   </div>
 </div>
+
+<!-- Firebase modulok és logika -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  // 🔽 A TE FIREBASE KONFIGURÁCIÓD (a nexus-67676 projekthez)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDW0lUVCf0N8VmLwmlnyoc2GAdW6llHuKs",
+    authDomain: "nexus-67676.firebaseapp.com",
+    projectId: "nexus-67676",
+    storageBucket: "nexus-67676.firebasestorage.app",
+    messagingSenderId: "640354273542",
+    appId: "1:640354273542:web:128bbc9ce5eb9e09557687",
+    measurementId: "G-C9CPN7FEP4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // DOM elemek
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const userInfo = document.getElementById('userInfo');
+  const downloadsCard = document.getElementById('downloadsCard');
+
+  // Felhasználó állapotának figyelése
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // bejelentkezett állapot
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = 'inline-flex';
+      userInfo.style.display = 'inline-block';
+      userInfo.innerHTML = `👋 Üdv, ${user.displayName || user.email}!`;
+      downloadsCard.style.display = 'block';   // megjelenik a letöltési kártya
+    } else {
+      // kijelentkezett állapot
+      loginBtn.style.display = 'inline-flex';
+      logoutBtn.style.display = 'none';
+      userInfo.style.display = 'none';
+      userInfo.innerHTML = '';
+      downloadsCard.style.display = 'none';    // elrejtjük a letöltési kártyát
+    }
+  });
+
+  loginBtn.onclick = () => signInWithPopup(auth, provider);
+  logoutBtn.onclick = () => signOut(auth);
+</script>
 
 <script>
   function toggleLicensePanel() {
