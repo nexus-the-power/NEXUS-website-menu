@@ -15,8 +15,7 @@ This includes:
 TinyURL: https://tinyurl.com/nexus-store
 GitHUB: https://nexus-the-power.github.io/NEXUS-website-menu/
 
-## 💬 Community
-Join the Discord server:
+## 💬 Discord
 https://discord.com/invite/Ac5eRRCEgz
 
 ## 📺 YouTube
