@@ -110,7 +110,7 @@
 
 <script>
     const AUTHORIZED_EMAIL_HASH = "a39e125749a51c569ac9cfdb12b1de8393df63b0ad3c7b82eb52d1a861185a04";
-    const ADMIN_PASSWORD_HASH = "5c6bbdb78eef9b5a2d171a1043303e2f0251a4ae60d51eb178845706c32e6e6f";
+    const ADMIN_PASSWORD_HASH = "ca68c377a947f72f3879fdd96a3e99f40392abf99b6f4fc6042f51335bd70506";
     
     async function hashText(text) {
         const encoder = new TextEncoder();
@@ -200,7 +200,7 @@
             if (callback) callback(true);
             return;
         }
-        const pwd = prompt("🔐 ADMINISZTRÁTORI HITELESÍTÉS\n\nA folytatáshoz add meg a titkos jelszót:");
+        const pwd = prompt("🔐 ADMINISZTRÁTORI HITELESÍTÉS\n\nA folytatáshoz add meg a jelszót:");
         if (pwd) {
             hashText(pwd).then(pwdHash => {
                 if (pwdHash === ADMIN_PASSWORD_HASH) {
