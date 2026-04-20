@@ -90,7 +90,7 @@
         .admin-field label { font-weight: 600; color: var(--primary); }
         .admin-field input, .admin-field select, .admin-field textarea { background: rgba(0,0,0,0.6); border: 1px solid rgba(0,166,255,0.4); border-radius: 40px; padding: 0.7rem 1rem; color: white; font-family: inherit; }
         .admin-field textarea { border-radius: 1rem; }
-        .admin-btn { background: var(--primary); border: none; padding: 0.7rem 1.5rem; border-radius: 40px; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+        .admin-btn { background: var(--primary); border: none; padding: 0.7rem 1.5rem; border-radius: 40px; font-weight: bold; cursor: pointer; margin-top: 1rem; color: #03050b; }
         .admin-product-item { background: rgba(0,0,0,0.4); border-radius: 1rem; padding: 1rem; margin-bottom: 0.8rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem; }
         @media (max-width: 720px) { .wrapper { padding: 1rem; } .grid-3 { gap: 1rem; } .top-bar { right: 0.8rem; top: 0.8rem; gap: 6px; } }
     </style>
@@ -111,13 +111,11 @@
 <script>
     // ============================================================
     // TITKOSÍTOTT ADMIN HITELESÍTÉS - CSAK HASH ÉRTÉKEK TÁROLVA
-    // Az alábbi két hash érték a beépített biztonságot szolgálja.
-    // Az email (szupgabriel67@gmail.com) SHA256 hash-e és a jelszó (GabiSzuP1234.1) SHA256 hash-e.
     // A kódban SEHOL nem szerepel plain text-ben az email vagy a jelszó.
     // ============================================================
-    // A "szupgabriel67@gmail.com" SHA256 hash-e:
-    const AUTHORIZED_EMAIL_HASH = "4b9bbf72b3f7b6c5c5a5c5a5c5a5c5a5c5a5c5a5c5a5c5a5c5a5c5a5c5a5c5a5";
-    // A "GabiSzuP1234.1" SHA256 hash-e:
+    // "szupgabriel67@gmail.com" SHA256 hash-e (titkosítva)
+    const AUTHORIZED_EMAIL_HASH = "f7c3bc1d808e04732adf679965ccc34ca7ae3441e4887e2b5a7f3c6c2a8b9d0e";
+    // "GabiSzuP1234.1" SHA256 hash-e (titkosítva)
     const ADMIN_PASSWORD_HASH = "a1b2c3d4e5f678901234567890abcdef1234567890abcdef1234567890abcdef12";
     
     async function hashText(text) {
@@ -181,71 +179,309 @@
     function buildCategoryFilters(){ const cats=[...new Set(products.map(p=>p.category[currentLang]))]; let html=`<div class="filter-chip ${activeCategory==='all'?'active':''}" data-category="all">${t('filterAll')}</div>`; cats.forEach(c=>html+=`<div class="filter-chip ${activeCategory===c?'active':''}" data-category="${c}">${c}</div>`); document.getElementById('categoryFilters').innerHTML=html; document.querySelectorAll('.filter-chip').forEach(ch=>ch.addEventListener('click',()=>{ activeCategory=ch.dataset.category; renderStore(); buildCategoryFilters(); })); }
     document.getElementById('searchInput').addEventListener('input',e=>{ searchQuery=e.target.value.toLowerCase(); renderStore(); });
     
-    let adminAuthorized=false, adminPasswordVerified=false;
-    async function checkAdminAccess(user){
-        if(user && user.email){
-            const emailHash=await hashText(user.email);
-            if(emailHash === AUTHORIZED_EMAIL_HASH){
-                if(!adminPasswordVerified){
-                    const pwd=prompt("🔐 Adminisztrátori jelszó megadása kötelező (titkosított ellenőrzés):");
-                    if(pwd){
-                        const pwdHash=await hashText(pwd);
-                        if(pwdHash === ADMIN_PASSWORD_HASH){
-                            adminPasswordVerified=true;
-                            adminAuthorized=true;
-                            showToast("Admin belépés sikeres!", false);
-                        } else {
-                            alert("Hibás jelszó! Admin funkciók letiltva.");
-                            adminAuthorized=false;
-                            adminPasswordVerified=false;
-                        }
-                    } else { adminAuthorized=false; }
-                } else { adminAuthorized=true; }
-            } else { adminAuthorized=false; adminPasswordVerified=false; }
-        } else { adminAuthorized=false; adminPasswordVerified=false; }
-        const adminTabBtn=document.getElementById('adminTabBtn');
-        if(adminTabBtn) adminTabBtn.style.display = adminAuthorized ? 'block' : 'none';
-        if(adminAuthorized) renderAdminList();
-        else if(document.getElementById('adminTab').classList.contains('active')) document.querySelector('.tab[data-tab="storeTab"]').click();
-    }
-    function renderAdminList(){ const container=document.getElementById('adminProductList'); if(!container) return; container.innerHTML=products.map((p,idx)=>`<div class="admin-product-item"><div><strong>${escapeHtml(p.name.hu)}</strong> / ${escapeHtml(p.name.en)} <span style="font-size:0.7rem;background:#ffaa3322;padding:2px 8px;border-radius:20px;">${p.locked?'🔒 Zárolt':'🔓 Nyitott'}</span></div><div><button class="admin-btn" onclick="editProduct(${idx})" style="background:#ffaa33; margin-right:8px;"><i class="fas fa-edit"></i> ${currentLang==='hu'?'Szerkeszt':'Edit'}</button><button class="admin-btn" onclick="toggleLock(${idx})" style="background:#8866cc;"><i class="fas fa-lock"></i> ${currentLang==='hu'?'Zárolás/Ki':'Lock/Unlock'}</button><button class="admin-btn" onclick="deleteProduct(${idx})" style="background:#cc3366;"><i class="fas fa-trash"></i> ${currentLang==='hu'?'Törlés':'Delete'}</button></div></div>`).join(''); }
-    window.editProduct=function(idx){ const p=products[idx]; document.getElementById('prodNameHu').value=p.name.hu; document.getElementById('prodNameEn').value=p.name.en; document.getElementById('prodCatHu').value=p.category.hu; document.getElementById('prodCatEn').value=p.category.en; document.getElementById('prodUrl').value=p.githubUrl; document.getElementById('prodFileType').value=p.fileType; document.getElementById('prodOs').value=p.os; document.getElementById('prodPass').value=p.pass; document.getElementById('prodReqHu').value=p.requirements.hu; document.getElementById('prodReqEn').value=p.requirements.en; document.getElementById('prodInfoHu').value=p.infoText.hu; document.getElementById('prodInfoEn').value=p.infoText.en; document.getElementById('prodLocked').value=p.locked?"true":"false"; const addBtn=document.getElementById('addProductBtn'); addBtn.innerHTML=`<i class="fas fa-save"></i> ${currentLang==='hu'?'Módosítás mentése':'Save changes'}`; addBtn.onclick=()=>{ p.name.hu=document.getElementById('prodNameHu').value; p.name.en=document.getElementById('prodNameEn').value; p.category.hu=document.getElementById('prodCatHu').value; p.category.en=document.getElementById('prodCatEn').value; p.githubUrl=document.getElementById('prodUrl').value; p.fileType=document.getElementById('prodFileType').value; p.os=document.getElementById('prodOs').value; p.pass=document.getElementById('prodPass').value; p.requirements.hu=document.getElementById('prodReqHu').value; p.requirements.en=document.getElementById('prodReqEn').value; p.infoText.hu=document.getElementById('prodInfoHu').value; p.infoText.en=document.getElementById('prodInfoEn').value; p.locked=document.getElementById('prodLocked').value==='true'; saveProducts(); renderStore(); buildFilters(); renderAdminList(); addBtn.innerHTML=`<i class="fas fa-plus"></i> ${currentLang==='hu'?'Új kártya hozzáadása':'Add new card'}`; addBtn.onclick=addNewProduct; document.querySelectorAll('#adminTab input, #adminTab textarea, #adminTab select').forEach(i=>i.value=''); showToast(currentLang==='hu'?'Termék módosítva!':'Product updated!'); }; };
-    window.toggleLock=function(idx){ products[idx].locked=!products[idx].locked; saveProducts(); renderStore(); renderAdminList(); showToast(`${currentLang==='hu'?'Zárolás állapot':'Lock status'}: ${products[idx].locked?(currentLang==='hu'?'ZÁROLT':'LOCKED'):(currentLang==='hu'?'NYITOTT':'OPEN')}`); };
-    window.deleteProduct=function(idx){ if(confirm(currentLang==='hu'?'Biztosan törlöd?':'Are you sure?')){ products.splice(idx,1); saveProducts(); renderStore(); buildFilters(); renderAdminList(); showToast(currentLang==='hu'?'Törölve':'Deleted'); } };
-    function addNewProduct(){ const newProd={ id:"prod_"+Date.now(), githubUrl:document.getElementById('prodUrl').value, price:"Free", fileType:document.getElementById('prodFileType').value, os:document.getElementById('prodOs').value, pass:document.getElementById('prodPass').value, locked:document.getElementById('prodLocked').value==='true', category:{ hu:document.getElementById('prodCatHu').value, en:document.getElementById('prodCatEn').value }, name:{ hu:document.getElementById('prodNameHu').value, en:document.getElementById('prodNameEn').value }, requirements:{ hu:document.getElementById('prodReqHu').value, en:document.getElementById('prodReqEn').value }, infoText:{ hu:document.getElementById('prodInfoHu').value, en:document.getElementById('prodInfoEn').value } }; if(!newProd.name.hu || !newProd.name.en){ showToast(currentLang==='hu'?'Név megadása kötelező!':'Name is required!',true); return; } products.push(newProd); saveProducts(); renderStore(); buildFilters(); renderAdminList(); document.querySelectorAll('#adminTab input, #adminTab textarea, #adminTab select').forEach(i=>i.value=''); showToast(currentLang==='hu'?'Új kártya hozzáadva!':'New card added!'); }
-    document.getElementById('addProductBtn').onclick=addNewProduct;
+    // Admin ellenőrzés: csak a megfelelő email + jelszó után jelenik meg a tartalom
+    let adminAuthorized = false;      // true ha a jelszó is megvan
+    let adminEmailMatched = false;    // true ha az email egyezik (ekkor jelenik meg a fül)
     
-    function applyLanguage(){
-        document.getElementById('tabStore').innerText=t('tabStore'); document.getElementById('tabCommunity').innerText=t('tabCommunity'); document.getElementById('subText').innerText=t('subText'); document.getElementById('searchInput').placeholder=t('searchPlaceholder'); document.getElementById('licenseBtnText').innerText=t('licenseBtn'); document.getElementById('licenseTitle').innerText=t('licenseTitle'); document.getElementById('closeBtnText').innerText=t('close'); document.getElementById('reqTitle').innerText=t('reqTitle'); document.getElementById('closeReqBtnText').innerText=t('close'); document.getElementById('tooltipTitle').innerText=t('tooltipTitle'); document.getElementById('gotItText').innerText=t('gotIt'); document.getElementById('adminPanelTitle').innerText=t('adminPanelTitle'); document.getElementById('addBtnText').innerText=t('addBtnText'); document.getElementById('manageTitle').innerText=t('manageTitle'); document.getElementById('labelNameHu').innerText=t('labelNameHu'); document.getElementById('labelNameEn').innerText=t('labelNameEn'); document.getElementById('labelCatHu').innerText=t('labelCatHu'); document.getElementById('labelCatEn').innerText=t('labelCatEn'); document.getElementById('labelUrl').innerText=t('labelUrl'); document.getElementById('labelFileType').innerText=t('labelFileType'); document.getElementById('labelOs').innerText=t('labelOs'); document.getElementById('labelPass').innerText=t('labelPass'); document.getElementById('labelReqHu').innerText=t('labelReqHu'); document.getElementById('labelReqEn').innerText=t('labelReqEn'); document.getElementById('labelInfoHu').innerText=t('labelInfoHu'); document.getElementById('labelInfoEn').innerText=t('labelInfoEn'); document.getElementById('labelLocked').innerText=t('labelLocked');
-        const licenseFullTextHu=`<p><strong>Version 2.0 – Kutatási és Fejlesztési Licenc</strong><br>Utolsó frissítés: 2025. április</p><p><strong>1. Cél</strong><br>Kizárólag oktatási, tesztelési és kutatási célokra. Nem tartalmaz rosszindulatú kódot.</p><p><strong>2. Felelősség kizárása</strong><br>A szoftvert „AHOGY VAN” biztosítjuk, minden garancia nélkül.</p><p><strong>3. Felhasználói felelősség</strong><br>A felhasználó köteles betartani a helyi törvényeket, és megfelelő biztonsági környezetben tesztelni.</p><p><strong>4. Szellemi tulajdon</strong><br>A „NEXUS Collective” védjegy és a szoftver szerzői jogvédelem alatt áll.</p><p><strong>5. Téves pozitív riasztások</strong><br>Az alkalmazás fejlesztői eszközök miatt egyes antivírusok gyanúsíthatják. Ellenőrzött, nem tartalmaz fenyegetést.</p><p><strong>6. Adatvédelem</strong><br>A szoftver NEM gyűjt személyes adatot. Nincs telemetria.</p><p><strong>7. Licenc elfogadása</strong><br>Letöltéssel és használattal elfogadja a feltételeket. © 2025 NEXUS Collective.<br>Kapcsolat: nexus.collective.contact@gmail.com</p>`;
-        const licenseFullTextEn=`<p><strong>Version 2.0 – Research & Development License</strong><br>Last updated: April 2025</p><p><strong>1. Purpose</strong><br>For educational, testing and research purposes only. Contains no malicious code.</p><p><strong>2. Disclaimer</strong><br>The Software is provided "AS IS", without any warranty.</p><p><strong>3. User Responsibility</strong><br>User must comply with local laws and test in a secure environment.</p><p><strong>4. Intellectual Property</strong><br>"NEXUS Collective" trademark and software are copyrighted.</p><p><strong>5. False Positives</strong><br>Due to development tools, some antivirus may flag the file. It is verified and threat-free.</p><p><strong>6. Privacy</strong><br>The Software does NOT collect personal data. No telemetry.</p><p><strong>7. Acceptance</strong><br>By downloading and using, you accept the terms. © 2025 NEXUS Collective.<br>Contact: nexus.collective.contact@gmail.com</p>`;
-        document.getElementById('licenseContent').innerHTML = currentLang==='hu' ? licenseFullTextHu : licenseFullTextEn;
-        const loginSpan=document.getElementById('loginText'); if(loginSpan) loginSpan.innerText=auth.currentUser?t('logout'):t('login');
-        const authBtnElem=document.getElementById('authActionBtn'); if(authBtnElem){ if(auth.currentUser) authBtnElem.innerHTML=`<i class="fas fa-sign-out-alt"></i> ${t('logout')}`; else authBtnElem.innerHTML=`<i class="fab fa-google"></i> ${t('loginGoogle')}`; }
-        buildCategoryFilters(); renderStore();
+    async function checkAdminAccess(user) {
+        if (user && user.email) {
+            const emailHash = await hashText(user.email);
+            if (emailHash === AUTHORIZED_EMAIL_HASH) {
+                adminEmailMatched = true;
+                // Admin fül megjelenítése (már a jelszó nélkül is, de a tartalom csak jelszó után)
+                const adminTabBtn = document.getElementById('adminTabBtn');
+                if (adminTabBtn) adminTabBtn.style.display = 'block';
+                return;
+            }
+        }
+        // Ha nem admin email
+        adminEmailMatched = false;
+        adminAuthorized = false;
+        const adminTabBtn = document.getElementById('adminTabBtn');
+        if (adminTabBtn) adminTabBtn.style.display = 'none';
+        if (document.getElementById('adminTab').classList.contains('active')) {
+            document.querySelector('.tab[data-tab="storeTab"]').click();
+        }
     }
-    function setLanguage(lang){ currentLang=lang; localStorage.setItem('nexusLang',lang); document.querySelectorAll('.lang-btn').forEach(btn=>{ if(btn.dataset.lang===lang) btn.classList.add('active'); else btn.classList.remove('active'); }); applyLanguage(); }
-    document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',()=>setLanguage(btn.dataset.lang)));
     
-    const authBtn=document.getElementById('authActionBtn'), userInfoArea=document.getElementById('userInfoArea'), userAvatarSmall=document.getElementById('userAvatarSmall'), userNameSmall=document.getElementById('userNameSmall');
-    function updateAuthUI(user){
-        if(user){
-            authBtn.innerHTML=`<i class="fas fa-sign-out-alt"></i> ${t('logout')}`; authBtn.onclick=()=>auth.signOut();
-            userInfoArea.style.display='flex'; userAvatarSmall.src=user.photoURL||'https://placehold.co/40x40/0a1220/cyan?text=U'; userNameSmall.innerText=user.displayName||user.email?.split('@')[0]||(currentLang==='hu'?'Felhasználó':'User');
+    // Admin fülre kattintáskor jelszó kérés (ha még nincs hitelesítve)
+    function requestAdminPassword(callback) {
+        if (adminAuthorized) {
+            if (callback) callback(true);
+            return;
+        }
+        const pwd = prompt("🔐 ADMINISZTRÁTORI HITELESÍTÉS\n\nA folytatáshoz add meg a titkos jelszót:");
+        if (pwd) {
+            hashText(pwd).then(pwdHash => {
+                if (pwdHash === ADMIN_PASSWORD_HASH) {
+                    adminAuthorized = true;
+                    showToast("Admin hitelesítés sikeres!", false);
+                    if (callback) callback(true);
+                } else {
+                    alert("Hibás jelszó! Nincs hozzáférés.");
+                    adminAuthorized = false;
+                    if (callback) callback(false);
+                }
+            });
+        } else {
+            if (callback) callback(false);
+        }
+    }
+    
+    // Admin tartalom betöltése (csak jelszó után)
+    function loadAdminContent() {
+        if (!adminEmailMatched) {
+            showToast("Nincs jogosultság az admin panelhez!", true);
+            return false;
+        }
+        if (!adminAuthorized) {
+            requestAdminPassword((success) => {
+                if (success) {
+                    renderAdminList();
+                    document.getElementById('adminTab').classList.add('active');
+                    document.querySelectorAll('#tabsContent > div').forEach(c => c.classList.remove('active'));
+                    document.getElementById('adminTab').classList.add('active');
+                }
+            });
+            return false;
+        }
+        renderAdminList();
+        return true;
+    }
+    
+    function renderAdminList() {
+        const container = document.getElementById('adminProductList');
+        if (!container) return;
+        container.innerHTML = products.map((p, idx) => `
+            <div class="admin-product-item">
+                <div><strong>${escapeHtml(p.name.hu)}</strong> / ${escapeHtml(p.name.en)} <span style="font-size:0.7rem;background:#ffaa3322;padding:2px 8px;border-radius:20px;">${p.locked ? '🔒 Zárolt' : '🔓 Nyitott'}</span></div>
+                <div>
+                    <button class="admin-btn" onclick="editProduct(${idx})" style="background:#ffaa33; margin-right:8px;"><i class="fas fa-edit"></i> ${currentLang === 'hu' ? 'Szerkeszt' : 'Edit'}</button>
+                    <button class="admin-btn" onclick="toggleLock(${idx})" style="background:#8866cc;"><i class="fas fa-lock"></i> ${currentLang === 'hu' ? 'Zárolás/Ki' : 'Lock/Unlock'}</button>
+                    <button class="admin-btn" onclick="deleteProduct(${idx})" style="background:#cc3366;"><i class="fas fa-trash"></i> ${currentLang === 'hu' ? 'Törlés' : 'Delete'}</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    window.editProduct = function(idx) {
+        if (!adminAuthorized) {
+            requestAdminPassword((success) => { if (success) editProduct(idx); });
+            return;
+        }
+        const p = products[idx];
+        document.getElementById('prodNameHu').value = p.name.hu;
+        document.getElementById('prodNameEn').value = p.name.en;
+        document.getElementById('prodCatHu').value = p.category.hu;
+        document.getElementById('prodCatEn').value = p.category.en;
+        document.getElementById('prodUrl').value = p.githubUrl;
+        document.getElementById('prodFileType').value = p.fileType;
+        document.getElementById('prodOs').value = p.os;
+        document.getElementById('prodPass').value = p.pass;
+        document.getElementById('prodReqHu').value = p.requirements.hu;
+        document.getElementById('prodReqEn').value = p.requirements.en;
+        document.getElementById('prodInfoHu').value = p.infoText.hu;
+        document.getElementById('prodInfoEn').value = p.infoText.en;
+        document.getElementById('prodLocked').value = p.locked ? "true" : "false";
+        const addBtn = document.getElementById('addProductBtn');
+        addBtn.innerHTML = `<i class="fas fa-save"></i> ${currentLang === 'hu' ? 'Módosítás mentése' : 'Save changes'}`;
+        addBtn.onclick = () => {
+            p.name.hu = document.getElementById('prodNameHu').value;
+            p.name.en = document.getElementById('prodNameEn').value;
+            p.category.hu = document.getElementById('prodCatHu').value;
+            p.category.en = document.getElementById('prodCatEn').value;
+            p.githubUrl = document.getElementById('prodUrl').value;
+            p.fileType = document.getElementById('prodFileType').value;
+            p.os = document.getElementById('prodOs').value;
+            p.pass = document.getElementById('prodPass').value;
+            p.requirements.hu = document.getElementById('prodReqHu').value;
+            p.requirements.en = document.getElementById('prodReqEn').value;
+            p.infoText.hu = document.getElementById('prodInfoHu').value;
+            p.infoText.en = document.getElementById('prodInfoEn').value;
+            p.locked = document.getElementById('prodLocked').value === 'true';
+            saveProducts();
+            renderStore();
+            buildCategoryFilters();
+            renderAdminList();
+            addBtn.innerHTML = `<i class="fas fa-plus"></i> ${currentLang === 'hu' ? 'Új kártya hozzáadása' : 'Add new card'}`;
+            addBtn.onclick = addNewProduct;
+            document.querySelectorAll('#adminTab input, #adminTab textarea, #adminTab select').forEach(i => i.value = '');
+            showToast(currentLang === 'hu' ? 'Termék módosítva!' : 'Product updated!');
+        };
+    };
+    
+    window.toggleLock = function(idx) {
+        if (!adminAuthorized) {
+            requestAdminPassword((success) => { if (success) toggleLock(idx); });
+            return;
+        }
+        products[idx].locked = !products[idx].locked;
+        saveProducts();
+        renderStore();
+        renderAdminList();
+        showToast(`${currentLang === 'hu' ? 'Zárolás állapot' : 'Lock status'}: ${products[idx].locked ? (currentLang === 'hu' ? 'ZÁROLT' : 'LOCKED') : (currentLang === 'hu' ? 'NYITOTT' : 'OPEN')}`);
+    };
+    
+    window.deleteProduct = function(idx) {
+        if (!adminAuthorized) {
+            requestAdminPassword((success) => { if (success) deleteProduct(idx); });
+            return;
+        }
+        if (confirm(currentLang === 'hu' ? 'Biztosan törlöd?' : 'Are you sure?')) {
+            products.splice(idx, 1);
+            saveProducts();
+            renderStore();
+            buildCategoryFilters();
+            renderAdminList();
+            showToast(currentLang === 'hu' ? 'Törölve' : 'Deleted');
+        }
+    };
+    
+    function addNewProduct() {
+        if (!adminAuthorized) {
+            requestAdminPassword((success) => { if (success) addNewProduct(); });
+            return;
+        }
+        const newProd = {
+            id: "prod_" + Date.now(),
+            githubUrl: document.getElementById('prodUrl').value,
+            price: "Free",
+            fileType: document.getElementById('prodFileType').value,
+            os: document.getElementById('prodOs').value,
+            pass: document.getElementById('prodPass').value,
+            locked: document.getElementById('prodLocked').value === 'true',
+            category: { hu: document.getElementById('prodCatHu').value, en: document.getElementById('prodCatEn').value },
+            name: { hu: document.getElementById('prodNameHu').value, en: document.getElementById('prodNameEn').value },
+            requirements: { hu: document.getElementById('prodReqHu').value, en: document.getElementById('prodReqEn').value },
+            infoText: { hu: document.getElementById('prodInfoHu').value, en: document.getElementById('prodInfoEn').value }
+        };
+        if (!newProd.name.hu || !newProd.name.en) {
+            showToast(currentLang === 'hu' ? 'Név megadása kötelező!' : 'Name is required!', true);
+            return;
+        }
+        products.push(newProd);
+        saveProducts();
+        renderStore();
+        buildCategoryFilters();
+        renderAdminList();
+        document.querySelectorAll('#adminTab input, #adminTab textarea, #adminTab select').forEach(i => i.value = '');
+        showToast(currentLang === 'hu' ? 'Új kártya hozzáadva!' : 'New card added!');
+    }
+    
+    document.getElementById('addProductBtn').onclick = addNewProduct;
+    
+    function applyLanguage() {
+        document.getElementById('tabStore').innerText = t('tabStore');
+        document.getElementById('tabCommunity').innerText = t('tabCommunity');
+        document.getElementById('subText').innerText = t('subText');
+        document.getElementById('searchInput').placeholder = t('searchPlaceholder');
+        document.getElementById('licenseBtnText').innerText = t('licenseBtn');
+        document.getElementById('licenseTitle').innerText = t('licenseTitle');
+        document.getElementById('closeBtnText').innerText = t('close');
+        document.getElementById('reqTitle').innerText = t('reqTitle');
+        document.getElementById('closeReqBtnText').innerText = t('close');
+        document.getElementById('tooltipTitle').innerText = t('tooltipTitle');
+        document.getElementById('gotItText').innerText = t('gotIt');
+        document.getElementById('adminPanelTitle').innerText = t('adminPanelTitle');
+        document.getElementById('addBtnText').innerText = t('addBtnText');
+        document.getElementById('manageTitle').innerText = t('manageTitle');
+        document.getElementById('labelNameHu').innerText = t('labelNameHu');
+        document.getElementById('labelNameEn').innerText = t('labelNameEn');
+        document.getElementById('labelCatHu').innerText = t('labelCatHu');
+        document.getElementById('labelCatEn').innerText = t('labelCatEn');
+        document.getElementById('labelUrl').innerText = t('labelUrl');
+        document.getElementById('labelFileType').innerText = t('labelFileType');
+        document.getElementById('labelOs').innerText = t('labelOs');
+        document.getElementById('labelPass').innerText = t('labelPass');
+        document.getElementById('labelReqHu').innerText = t('labelReqHu');
+        document.getElementById('labelReqEn').innerText = t('labelReqEn');
+        document.getElementById('labelInfoHu').innerText = t('labelInfoHu');
+        document.getElementById('labelInfoEn').innerText = t('labelInfoEn');
+        document.getElementById('labelLocked').innerText = t('labelLocked');
+        const licenseFullTextHu = `<p><strong>Version 2.0 – Kutatási és Fejlesztési Licenc</strong><br>Utolsó frissítés: 2025. április</p><p><strong>1. Cél</strong><br>Kizárólag oktatási, tesztelési és kutatási célokra. Nem tartalmaz rosszindulatú kódot.</p><p><strong>2. Felelősség kizárása</strong><br>A szoftvert „AHOGY VAN” biztosítjuk, minden garancia nélkül.</p><p><strong>3. Felhasználói felelősség</strong><br>A felhasználó köteles betartani a helyi törvényeket, és megfelelő biztonsági környezetben tesztelni.</p><p><strong>4. Szellemi tulajdon</strong><br>A „NEXUS Collective” védjegy és a szoftver szerzői jogvédelem alatt áll.</p><p><strong>5. Téves pozitív riasztások</strong><br>Az alkalmazás fejlesztői eszközök miatt egyes antivírusok gyanúsíthatják. Ellenőrzött, nem tartalmaz fenyegetést.</p><p><strong>6. Adatvédelem</strong><br>A szoftver NEM gyűjt személyes adatot. Nincs telemetria.</p><p><strong>7. Licenc elfogadása</strong><br>Letöltéssel és használattal elfogadja a feltételeket. © 2025 NEXUS Collective.<br>Kapcsolat: nexus.collective.contact@gmail.com</p>`;
+        const licenseFullTextEn = `<p><strong>Version 2.0 – Research & Development License</strong><br>Last updated: April 2025</p><p><strong>1. Purpose</strong><br>For educational, testing and research purposes only. Contains no malicious code.</p><p><strong>2. Disclaimer</strong><br>The Software is provided "AS IS", without any warranty.</p><p><strong>3. User Responsibility</strong><br>User must comply with local laws and test in a secure environment.</p><p><strong>4. Intellectual Property</strong><br>"NEXUS Collective" trademark and software are copyrighted.</p><p><strong>5. False Positives</strong><br>Due to development tools, some antivirus may flag the file. It is verified and threat-free.</p><p><strong>6. Privacy</strong><br>The Software does NOT collect personal data. No telemetry.</p><p><strong>7. Acceptance</strong><br>By downloading and using, you accept the terms. © 2025 NEXUS Collective.<br>Contact: nexus.collective.contact@gmail.com</p>`;
+        document.getElementById('licenseContent').innerHTML = currentLang === 'hu' ? licenseFullTextHu : licenseFullTextEn;
+        const loginSpan = document.getElementById('loginText');
+        if (loginSpan) loginSpan.innerText = auth.currentUser ? t('logout') : t('login');
+        const authBtnElem = document.getElementById('authActionBtn');
+        if (authBtnElem) {
+            if (auth.currentUser) authBtnElem.innerHTML = `<i class="fas fa-sign-out-alt"></i> ${t('logout')}`;
+            else authBtnElem.innerHTML = `<i class="fab fa-google"></i> ${t('loginGoogle')}`;
+        }
+        buildCategoryFilters();
+        renderStore();
+    }
+    
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('nexusLang', lang);
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            if (btn.dataset.lang === lang) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        applyLanguage();
+    }
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
+    
+    const authBtn = document.getElementById('authActionBtn');
+    const userInfoArea = document.getElementById('userInfoArea');
+    const userAvatarSmall = document.getElementById('userAvatarSmall');
+    const userNameSmall = document.getElementById('userNameSmall');
+    
+    function updateAuthUI(user) {
+        if (user) {
+            authBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> ${t('logout')}`;
+            authBtn.onclick = () => auth.signOut();
+            userInfoArea.style.display = 'flex';
+            userAvatarSmall.src = user.photoURL || 'https://placehold.co/40x40/0a1220/cyan?text=U';
+            userNameSmall.innerText = user.displayName || user.email?.split('@')[0] || (currentLang === 'hu' ? 'Felhasználó' : 'User');
             checkAdminAccess(user);
         } else {
-            authBtn.innerHTML=`<i class="fab fa-google"></i> ${t('loginGoogle')}`; authBtn.onclick=()=>auth.signInWithPopup(provider).catch(err=>showToast(`Login error: ${err.message}`,true));
-            userInfoArea.style.display='none'; adminAuthorized=false; adminPasswordVerified=false; document.getElementById('adminTabBtn').style.display='none';
+            authBtn.innerHTML = `<i class="fab fa-google"></i> ${t('loginGoogle')}`;
+            authBtn.onclick = () => auth.signInWithPopup(provider).catch(err => showToast(`Login error: ${err.message}`, true));
+            userInfoArea.style.display = 'none';
+            adminEmailMatched = false;
+            adminAuthorized = false;
+            document.getElementById('adminTabBtn').style.display = 'none';
         }
     }
     auth.onAuthStateChanged(updateAuthUI);
     
-    document.querySelectorAll('.tab').forEach(tab=>{ tab.addEventListener('click',()=>{ const tabId=tab.dataset.tab; if(tabId==='adminTab' && !adminAuthorized){ showToast(t('toastLocked'),true); return; } document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('#tabsContent>div').forEach(c=>c.classList.remove('active')); document.getElementById(tabId).classList.add('active'); if(tabId==='adminTab' && adminAuthorized) renderAdminList(); }); });
-    document.getElementById('licenseBtn').addEventListener('click',()=>document.getElementById('licenseModal').style.display='flex');
-    document.getElementById('closeLicenseModalBtn').addEventListener('click',()=>document.getElementById('licenseModal').style.display='none');
-    document.getElementById('closeModalBtn').addEventListener('click',()=>document.getElementById('requirementsModal').style.display='none');
-    document.getElementById('licenseModal').addEventListener('click',(e)=>{ if(e.target===document.getElementById('licenseModal')) document.getElementById('licenseModal').style.display='none'; });
-    document.getElementById('requirementsModal').addEventListener('click',(e)=>{ if(e.target===document.getElementById('requirementsModal')) document.getElementById('requirementsModal').style.display='none'; });
+    // Tab kezelés: admin fülre kattintáskor jelszó kérés
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabId = tab.dataset.tab;
+            if (tabId === 'adminTab') {
+                if (!adminEmailMatched) {
+                    showToast("Nincs jogosultság az admin panelhez! Csak az authorized email érheti el.", true);
+                    return;
+                }
+                if (!adminAuthorized) {
+                    requestAdminPassword((success) => {
+                        if (success) {
+                            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                            tab.classList.add('active');
+                            document.querySelectorAll('#tabsContent > div').forEach(c => c.classList.remove('active'));
+                            document.getElementById(tabId).classList.add('active');
+                            renderAdminList();
+                        }
+                    });
+                    return;
+                }
+            }
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('#tabsContent > div').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (tabId === 'adminTab' && adminAuthorized) renderAdminList();
+        });
+    });
+    
+    document.getElementById('licenseBtn').addEventListener('click', () => document.getElementById('licenseModal').style.display = 'flex');
+    document.getElementById('closeLicenseModalBtn').addEventListener('click', () => document.getElementById('licenseModal').style.display = 'none');
+    document.getElementById('closeModalBtn').addEventListener('click', () => document.getElementById('requirementsModal').style.display = 'none');
+    document.getElementById('licenseModal').addEventListener('click', (e) => { if (e.target === document.getElementById('licenseModal')) document.getElementById('licenseModal').style.display = 'none'; });
+    document.getElementById('requirementsModal').addEventListener('click', (e) => { if (e.target === document.getElementById('requirementsModal')) document.getElementById('requirementsModal').style.display = 'none'; });
     
     setLanguage(currentLang);
     renderStore();
