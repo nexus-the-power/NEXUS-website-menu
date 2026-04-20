@@ -10,1041 +10,211 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg-deep: #03050b;
-            --bg-surface: rgba(8, 16, 32, 0.7);
-            --glass-edge: rgba(0, 166, 255, 0.25);
-            --primary: #00a6ff;
-            --primary-glow: rgba(0, 166, 255, 0.5);
-            --primary-dark: #0077cc;
-            --text-main: #f0f4fe;
-            --text-dim: #8e9eb5;
-            --card-radius: 28px;
-            --transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            --bg-deep: #03050b; --bg-surface: rgba(8, 16, 32, 0.7);
+            --glass-edge: rgba(0, 166, 255, 0.25); --primary: #00a6ff;
+            --primary-glow: rgba(0, 166, 255, 0.5); --primary-dark: #0077cc;
+            --text-main: #f0f4fe; --text-dim: #8e9eb5;
+            --card-radius: 28px; --transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-
-        body {
-            background: radial-gradient(circle at 30% 10%, #0a1428, var(--bg-deep) 90%);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-main);
-            min-height: 100vh;
-            line-height: 1.5;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Tech background - csak izzó orbok, nincs rács */
-        .tech-bg {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .gradient-orb {
-            position: absolute;
-            width: 80%;
-            height: 80%;
-            top: -20%;
-            left: -10%;
-            background: radial-gradient(ellipse, rgba(0, 166, 255, 0.12), transparent 70%);
-            filter: blur(90px);
-            animation: slowOrbit 22s infinite alternate;
-        }
-        .gradient-orb2 {
-            bottom: -30%;
-            right: -20%;
-            top: auto;
-            left: auto;
-            background: radial-gradient(ellipse, rgba(0, 200, 255, 0.08), transparent 70%);
-            animation: slowOrbit2 18s infinite alternate;
-        }
-        @keyframes slowOrbit {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-            100% { transform: translate(3%, 2%) scale(1.2); opacity: 0.7; }
-        }
-        @keyframes slowOrbit2 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-            100% { transform: translate(-4%, -3%) scale(1.3); opacity: 0.6; }
-        }
-
-        .wrapper {
-            position: relative;
-            z-index: 2;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.5rem 2rem 4rem;
-        }
-
-        /* Hero */
-        .hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 2.5rem;
-            text-align: center;
-        }
-        .logo-ring {
-            width: 100px;
-            height: 100px;
-            background: rgba(0, 166, 255, 0.08);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 28px rgba(0, 166, 255, 0.3);
-            margin-bottom: 1rem;
-        }
-        .logo-ring i {
-            font-size: 3.4rem;
-            color: var(--primary);
-            filter: drop-shadow(0 0 6px var(--primary));
-        }
-        .brand {
-            font-size: 0.85rem;
-            letter-spacing: 6px;
-            font-weight: 500;
-            color: var(--primary);
-            margin-bottom: 0.25rem;
-        }
-        h1 {
-            font-size: clamp(2.8rem, 9vw, 5rem);
-            font-weight: 800;
-            background: linear-gradient(125deg, #ffffff, var(--primary), #7bc9ff);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: -0.02em;
-        }
-        .sub {
-            font-size: 0.9rem;
-            color: var(--text-dim);
-            border-bottom: 1px dashed var(--primary);
-            display: inline-block;
-            padding-bottom: 5px;
-        }
-
-        /* Auth panel + nyelvváltó */
-        .top-bar {
-            position: fixed;
-            top: 1.2rem;
-            right: 1.8rem;
-            z-index: 110;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .auth-panel {
-            background: rgba(6, 12, 24, 0.8);
-            backdrop-filter: blur(16px);
-            border-radius: 60px;
-            padding: 0.3rem 0.8rem 0.3rem 1.2rem;
-            border: 1px solid rgba(0, 166, 255, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: var(--transition);
-        }
-        .auth-btn {
-            background: linear-gradient(105deg, #0f1a2f, #071020);
-            border: none;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: var(--primary);
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: inherit;
-        }
-        .auth-btn:hover {
-            background: var(--primary);
-            color: #03050b;
-            box-shadow: 0 0 12px var(--primary-glow);
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .user-avatar-sm {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 1.5px solid var(--primary);
-            object-fit: cover;
-        }
-        .lang-switch {
-            background: rgba(6, 12, 24, 0.8);
-            backdrop-filter: blur(16px);
-            border-radius: 60px;
-            padding: 0.3rem 1rem;
-            border: 1px solid rgba(0, 166, 255, 0.5);
-            display: flex;
-            gap: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .lang-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            padding: 0.3rem 0.6rem;
-            border-radius: 40px;
-            transition: 0.2s;
-            font-family: inherit;
-            font-weight: 600;
-        }
-        .lang-btn.active {
-            background: var(--primary);
-            color: #03050b;
-            box-shadow: 0 0 8px var(--primary-glow);
-        }
-        .lang-btn:hover:not(.active) {
-            color: var(--primary);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        .tab {
-            padding: 0.6rem 2rem;
-            cursor: pointer;
-            border-radius: 60px;
-            background: transparent;
-            font-weight: 600;
-            transition: 0.2s;
-            color: var(--text-dim);
-            border: 1px solid transparent;
-        }
-        .tab.active {
-            color: var(--primary);
-            border-color: var(--primary);
-            background: rgba(0, 166, 255, 0.1);
-            box-shadow: 0 0 8px rgba(0, 166, 255, 0.2);
-        }
-
-        /* Search & filter bar */
-        .search-filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            background: rgba(6, 12, 24, 0.5);
-            backdrop-filter: blur(12px);
-            border-radius: 70px;
-            padding: 0.5rem 1rem;
-            border: 1px solid rgba(0, 166, 255, 0.2);
-        }
-        .search-box {
-            flex: 2;
-            min-width: 200px;
-            display: flex;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 60px;
-            padding: 0.4rem 1rem;
-            border: 1px solid var(--primary);
-        }
-        .search-box i {
-            color: var(--primary);
-            margin-right: 10px;
-        }
-        .search-box input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-main);
-            width: 100%;
-            font-size: 0.9rem;
-            font-family: inherit;
-        }
-        .filter-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .filter-chip {
-            background: rgba(20, 30, 50, 0.7);
-            border-radius: 40px;
-            padding: 0.4rem 1rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-            border: 1px solid transparent;
-            color: var(--text-dim);
-        }
-        .filter-chip.active {
-            background: var(--primary);
-            color: #03050b;
-            border-color: white;
-            box-shadow: 0 0 8px var(--primary-glow);
-        }
-        .filter-chip:hover:not(.active) {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* Product grid */
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 2rem;
-        }
-
-        /* Card */
-        .glass-card {
-            background: var(--bg-surface);
-            backdrop-filter: blur(14px);
-            border: 1px solid var(--glass-edge);
-            border-radius: var(--card-radius);
-            padding: 1.6rem;
-            transition: var(--transition);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
-        }
-        .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 28px 40px -15px rgba(0, 166, 255, 0.2);
-        }
-        .locked-card {
-            opacity: 0.7;
-            filter: blur(0.4px);
-        }
-        .locked-card::after {
-            content: "\f023";
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2.8rem;
-            color: var(--primary);
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .card-header {
-            border-left: 3px solid var(--primary);
-            padding-left: 1rem;
-            margin-bottom: 1.2rem;
-        }
-        .card-header h2 {
-            font-size: 1.55rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff, var(--primary));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-        .category-badge {
-            display: inline-block;
-            background: rgba(0, 166, 255, 0.15);
-            border-radius: 40px;
-            padding: 0.2rem 0.8rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 0.8rem;
-        }
-        .product-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-bottom: 1.2rem;
-            align-items: center;
-        }
-        .price-badge, .file-type, .os-badge {
-            padding: 0.25rem 1rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            background: rgba(0, 0, 0, 0.5);
-        }
+        body { background: radial-gradient(circle at 30% 10%, #0a1428, var(--bg-deep) 90%); font-family: 'Inter', sans-serif; color: var(--text-main); min-height: 100vh; line-height: 1.5; position: relative; overflow-x: hidden; }
+        .tech-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .gradient-orb { position: absolute; width: 80%; height: 80%; top: -20%; left: -10%; background: radial-gradient(ellipse, rgba(0, 166, 255, 0.12), transparent 70%); filter: blur(90px); animation: slowOrbit 22s infinite alternate; }
+        .gradient-orb2 { bottom: -30%; right: -20%; top: auto; left: auto; background: radial-gradient(ellipse, rgba(0, 200, 255, 0.08), transparent 70%); animation: slowOrbit2 18s infinite alternate; }
+        @keyframes slowOrbit { 0% { transform: translate(0, 0) scale(1); opacity: 0.4; } 100% { transform: translate(3%, 2%) scale(1.2); opacity: 0.7; } }
+        @keyframes slowOrbit2 { 0% { transform: translate(0, 0) scale(1); opacity: 0.3; } 100% { transform: translate(-4%, -3%) scale(1.3); opacity: 0.6; } }
+        .wrapper { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+        .hero { display: flex; flex-direction: column; align-items: center; margin-bottom: 2.5rem; text-align: center; }
+        .logo-ring { width: 100px; height: 100px; background: rgba(0, 166, 255, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); border: 1px solid var(--primary); box-shadow: 0 0 28px rgba(0, 166, 255, 0.3); margin-bottom: 1rem; }
+        .logo-ring i { font-size: 3.4rem; color: var(--primary); filter: drop-shadow(0 0 6px var(--primary)); }
+        .brand { font-size: 0.85rem; letter-spacing: 6px; font-weight: 500; color: var(--primary); margin-bottom: 0.25rem; }
+        h1 { font-size: clamp(2.8rem, 9vw, 5rem); font-weight: 800; background: linear-gradient(125deg, #ffffff, var(--primary), #7bc9ff); background-clip: text; -webkit-background-clip: text; color: transparent; letter-spacing: -0.02em; }
+        .sub { font-size: 0.9rem; color: var(--text-dim); border-bottom: 1px dashed var(--primary); display: inline-block; padding-bottom: 5px; }
+        .top-bar { position: fixed; top: 1.2rem; right: 1.8rem; z-index: 110; display: flex; gap: 12px; align-items: center; }
+        .auth-panel { background: rgba(6, 12, 24, 0.8); backdrop-filter: blur(16px); border-radius: 60px; padding: 0.3rem 0.8rem 0.3rem 1.2rem; border: 1px solid rgba(0, 166, 255, 0.5); display: flex; align-items: center; gap: 12px; transition: var(--transition); }
+        .auth-btn { background: linear-gradient(105deg, #0f1a2f, #071020); border: none; padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; font-size: 0.8rem; color: var(--primary); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-family: inherit; }
+        .auth-btn:hover { background: var(--primary); color: #03050b; box-shadow: 0 0 12px var(--primary-glow); }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-avatar-sm { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--primary); object-fit: cover; }
+        .lang-switch { background: rgba(6, 12, 24, 0.8); backdrop-filter: blur(16px); border-radius: 60px; padding: 0.3rem 1rem; border: 1px solid rgba(0, 166, 255, 0.5); display: flex; gap: 6px; font-size: 0.8rem; font-weight: 600; }
+        .lang-btn { background: transparent; border: none; color: var(--text-dim); cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 40px; transition: 0.2s; font-family: inherit; font-weight: 600; }
+        .lang-btn.active { background: var(--primary); color: #03050b; box-shadow: 0 0 8px var(--primary-glow); }
+        .tabs { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+        .tab { padding: 0.6rem 2rem; cursor: pointer; border-radius: 60px; background: transparent; font-weight: 600; transition: 0.2s; color: var(--text-dim); border: 1px solid transparent; }
+        .tab.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 166, 255, 0.1); box-shadow: 0 0 8px rgba(0, 166, 255, 0.2); }
+        .search-filter-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2rem; background: rgba(6, 12, 24, 0.5); backdrop-filter: blur(12px); border-radius: 70px; padding: 0.5rem 1rem; border: 1px solid rgba(0, 166, 255, 0.2); }
+        .search-box { flex: 2; min-width: 200px; display: flex; align-items: center; background: rgba(0, 0, 0, 0.4); border-radius: 60px; padding: 0.4rem 1rem; border: 1px solid var(--primary); }
+        .search-box i { color: var(--primary); margin-right: 10px; }
+        .search-box input { background: transparent; border: none; outline: none; color: var(--text-main); width: 100%; font-size: 0.9rem; font-family: inherit; }
+        .filter-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-chip { background: rgba(20, 30, 50, 0.7); border-radius: 40px; padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: 0.2s; border: 1px solid transparent; color: var(--text-dim); }
+        .filter-chip.active { background: var(--primary); color: #03050b; border-color: white; box-shadow: 0 0 8px var(--primary-glow); }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem; }
+        .glass-card { background: var(--bg-surface); backdrop-filter: blur(14px); border: 1px solid var(--glass-edge); border-radius: var(--card-radius); padding: 1.6rem; transition: var(--transition); position: relative; display: flex; flex-direction: column; box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5); }
+        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 28px 40px -15px rgba(0, 166, 255, 0.2); }
+        .locked-card { opacity: 0.7; filter: blur(0.4px); }
+        .locked-card::after { content: "\f023"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.8rem; color: var(--primary); opacity: 0.5; pointer-events: none; }
+        .card-header { border-left: 3px solid var(--primary); padding-left: 1rem; margin-bottom: 1.2rem; }
+        .card-header h2 { font-size: 1.55rem; font-weight: 700; background: linear-gradient(135deg, #fff, var(--primary)); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .category-badge { display: inline-block; background: rgba(0, 166, 255, 0.15); border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.7rem; font-weight: 600; color: var(--primary); margin-bottom: 0.8rem; }
+        .product-details { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.2rem; align-items: center; }
+        .price-badge, .file-type, .os-badge { padding: 0.25rem 1rem; border-radius: 40px; font-size: 0.7rem; font-weight: 600; background: rgba(0, 0, 0, 0.5); }
         .price-badge { color: #aaffdd; border: 1px solid #2effaa30; }
         .file-type { border: 1px solid var(--primary); color: var(--primary); }
         .os-badge { border: 1px solid #ffcc44; color: #ffcc44; }
-        .pass-btn {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--primary);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            color: var(--primary);
-            transition: 0.2s;
-        }
-        .pass-btn:hover {
-            background: var(--primary);
-            color: #03050b;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 0.8rem;
-            margin: 0.5rem 0;
-        }
-        .btn-download, .btn-requirements {
-            flex: 1;
-            text-align: center;
-            font-weight: 700;
-            padding: 0.7rem 0;
-            border-radius: 60px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.2s;
-            border: none;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-download {
-            background: linear-gradient(95deg, #0066ff, #0099ff);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 100, 255, 0.3);
-        }
-        .btn-download:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(95deg, #1a7aff, #00aaff);
-            box-shadow: 0 8px 20px rgba(0, 150, 255, 0.4);
-        }
-        .btn-requirements {
-            background: rgba(25, 35, 55, 0.9);
-            border: 1px solid var(--primary);
-            color: var(--text-main);
-        }
-        .btn-requirements:hover {
-            background: var(--primary);
-            color: #03050b;
-        }
-        .download-count {
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            margin: 0.4rem 0;
-        }
-        .secondary-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 0.8rem;
-            gap: 0.5rem;
-        }
-        .icon-btn, .highlight-btn {
-            background: rgba(18, 26, 40, 0.7);
-            border: 1px solid rgba(0, 166, 255, 0.3);
-            border-radius: 40px;
-            padding: 0.45rem 1rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: 0.2s;
-            color: var(--text-main);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .icon-btn:hover, .highlight-btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: #03050b;
-        }
-
-        /* Community */
-        .community-links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.5rem;
-            margin: 2.5rem 0;
-        }
-        .community-btn {
-            background: rgba(8, 16, 28, 0.7);
-            backdrop-filter: blur(10px);
-            padding: 0.9rem 2rem;
-            border-radius: 60px;
-            text-decoration: none;
-            font-weight: 600;
-            color: var(--text-main);
-            border: 1px solid var(--glass-edge);
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .community-btn:hover {
-            border-color: var(--primary);
-            background: rgba(0, 166, 255, 0.15);
-            color: var(--primary);
-            transform: scale(1.02);
-        }
-
-        /* License button */
-        .license-btn {
-            display: block;
-            margin: 3rem auto 0;
-            background: rgba(0, 80, 150, 0.2);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--primary);
-            border-radius: 60px;
-            padding: 0.9rem 2rem;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--primary);
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-            width: fit-content;
-            min-width: 250px;
-            letter-spacing: 0.5px;
-        }
-        .license-btn:hover {
-            background: var(--primary);
-            color: #03050b;
-            border-color: white;
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        /* Modals - scrollbar nélkül, szélesebb, teljes tartalom látszik */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(2, 4, 12, 0.92);
-            backdrop-filter: blur(12px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-card {
-            background: linear-gradient(145deg, #0c1225, #050811);
-            border: 1px solid var(--primary);
-            border-radius: 2rem;
-            padding: 2rem;
-            width: 900px;
-            max-width: 90%;
-            /* Nincs max-height, nincs overflow, nincs scrollbar */
-            color: var(--text-main);
-            box-shadow: 0 30px 50px rgba(0,0,0,0.6);
-        }
-        .modal-card h4 {
-            color: var(--primary);
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--primary);
-            padding-bottom: 0.6rem;
-        }
-        .license-text {
-            font-size: 0.9rem;
-            line-height: 1.5;
-            /* Nincs max-height, nincs overflow, nincs scrollbar */
-        }
-        .close-modal {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 40px;
-            cursor: pointer;
-            margin-top: 1.5rem;
-            color: white;
-            transition: 0.2s;
-            font-weight: 600;
-        }
-        .close-modal:hover {
-            background: var(--primary);
-            color: #03050b;
-        }
-        .highlight-tooltip {
-            position: fixed;
-            background: rgba(6, 12, 24, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--primary);
-            border-radius: 1.2rem;
-            padding: 1rem;
-            width: 280px;
-            z-index: 1100;
-            font-size: 0.85rem;
-            display: none;
-        }
-        .toast-msg {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0a1022ee;
-            backdrop-filter: blur(12px);
-            padding: 10px 24px;
-            border-radius: 60px;
-            border-left: 4px solid var(--primary);
-            z-index: 1200;
-            color: white;
-            white-space: nowrap;
-        }
+        .pass-btn { background: rgba(0, 0, 0, 0.5); border: 1px solid var(--primary); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: var(--primary); transition: 0.2s; }
+        .button-group { display: flex; gap: 0.8rem; margin: 0.5rem 0; }
+        .btn-download, .btn-requirements { flex: 1; text-align: center; font-weight: 700; padding: 0.7rem 0; border-radius: 60px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border: none; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-download { background: linear-gradient(95deg, #0066ff, #0099ff); color: white; box-shadow: 0 4px 12px rgba(0, 100, 255, 0.3); }
+        .btn-download:hover { transform: translateY(-2px); background: linear-gradient(95deg, #1a7aff, #00aaff); box-shadow: 0 8px 20px rgba(0, 150, 255, 0.4); }
+        .btn-requirements { background: rgba(25, 35, 55, 0.9); border: 1px solid var(--primary); color: var(--text-main); }
+        .secondary-actions { display: flex; justify-content: space-between; margin-top: 0.8rem; gap: 0.5rem; }
+        .icon-btn, .highlight-btn { background: rgba(18, 26, 40, 0.7); border: 1px solid rgba(0, 166, 255, 0.3); border-radius: 40px; padding: 0.45rem 1rem; font-size: 0.75rem; cursor: pointer; transition: 0.2s; color: var(--text-main); display: inline-flex; align-items: center; gap: 6px; }
+        .community-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 2.5rem 0; }
+        .community-btn { background: rgba(8, 16, 28, 0.7); backdrop-filter: blur(10px); padding: 0.9rem 2rem; border-radius: 60px; text-decoration: none; font-weight: 600; color: var(--text-main); border: 1px solid var(--glass-edge); transition: 0.2s; display: inline-flex; align-items: center; gap: 12px; }
+        .license-btn { display: block; margin: 3rem auto 0; background: rgba(0, 80, 150, 0.2); backdrop-filter: blur(12px); border: 1px solid var(--primary); border-radius: 60px; padding: 0.9rem 2rem; font-weight: 700; font-size: 0.9rem; color: var(--primary); cursor: pointer; text-align: center; width: fit-content; min-width: 250px; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 4, 12, 0.92); backdrop-filter: blur(12px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .modal-card { background: linear-gradient(145deg, #0c1225, #050811); border: 1px solid var(--primary); border-radius: 2rem; padding: 2rem; width: 900px; max-width: 90%; color: var(--text-main); box-shadow: 0 30px 50px rgba(0,0,0,0.6); }
+        .modal-card h4 { color: var(--primary); font-size: 1.6rem; margin-bottom: 1rem; border-bottom: 1px solid var(--primary); padding-bottom: 0.6rem; }
+        .license-text { font-size: 0.9rem; line-height: 1.5; }
+        .close-modal { background: rgba(255,255,255,0.1); border: none; padding: 0.5rem 1.5rem; border-radius: 40px; cursor: pointer; margin-top: 1.5rem; color: white; transition: 0.2s; font-weight: 600; }
+        .highlight-tooltip { position: fixed; background: rgba(6, 12, 24, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--primary); border-radius: 1.2rem; padding: 1rem; width: 280px; z-index: 1100; font-size: 0.85rem; display: none; }
+        .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #0a1022ee; backdrop-filter: blur(12px); padding: 10px 24px; border-radius: 60px; border-left: 4px solid var(--primary); z-index: 1200; color: white; white-space: nowrap; }
         #tabsContent > div { display: none; }
         #tabsContent > div.active { display: block; }
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            color: var(--text-dim);
-            font-size: 1rem;
-        }
-
-        @media (max-width: 720px) {
-            .wrapper { padding: 1rem; }
-            .grid-3 { gap: 1rem; }
-            .search-filter-bar { flex-direction: column; align-items: stretch; border-radius: 2rem; padding: 1rem; }
-            .filter-group { justify-content: center; }
-            .top-bar { right: 0.8rem; top: 0.8rem; gap: 6px; }
-            .user-name { display: none; }
-            .lang-switch { padding: 0.2rem 0.6rem; }
-            .auth-panel { padding: 0.2rem 0.6rem; }
-            .modal-card { padding: 1.2rem; width: 95%; }
-            .license-text { font-size: 0.8rem; }
-        }
+        .no-results { text-align: center; padding: 3rem; color: var(--text-dim); font-size: 1rem; }
+        .admin-panel { margin-top: 2rem; background: rgba(0,0,0,0.5); border-radius: 2rem; padding: 2rem; backdrop-filter: blur(12px); border: 1px solid var(--primary); }
+        .admin-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .admin-field { display: flex; flex-direction: column; gap: 0.4rem; }
+        .admin-field label { font-weight: 600; color: var(--primary); }
+        .admin-field input, .admin-field select, .admin-field textarea { background: rgba(0,0,0,0.6); border: 1px solid rgba(0,166,255,0.4); border-radius: 40px; padding: 0.7rem 1rem; color: white; font-family: inherit; }
+        .admin-field textarea { border-radius: 1rem; }
+        .admin-btn { background: var(--primary); border: none; padding: 0.7rem 1.5rem; border-radius: 40px; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+        .admin-product-item { background: rgba(0,0,0,0.4); border-radius: 1rem; padding: 1rem; margin-bottom: 0.8rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem; }
+        @media (max-width: 720px) { .wrapper { padding: 1rem; } .grid-3 { gap: 1rem; } .top-bar { right: 0.8rem; top: 0.8rem; gap: 6px; } }
     </style>
 </head>
 <body>
-<div class="tech-bg">
-    <div class="gradient-orb"></div>
-    <div class="gradient-orb gradient-orb2"></div>
-</div>
-
-<div class="top-bar">
-    <div class="lang-switch" id="langSwitch">
-        <button class="lang-btn" data-lang="hu">HU</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-    </div>
-    <div class="auth-panel" id="authFixed">
-        <div id="authStateContainer"><button id="authActionBtn" class="auth-btn"><i class="fab fa-google"></i> <span id="loginText">Belépés</span></button></div>
-        <div id="userInfoArea" style="display:none;" class="user-info">
-            <img id="userAvatarSmall" class="user-avatar-sm" src="">
-            <span id="userNameSmall" class="user-name"></span>
-        </div>
-    </div>
-</div>
-
-<div class="wrapper">
-    <div class="hero">
-        <div class="logo-ring"><i class="fas fa-cube"></i></div>
-        <div class="brand">NΞXUS COLLECTIVE</div>
-        <h1>NΞXUS STORE</h1>
-        <div class="sub" id="subText">premium .exe releases • direct GitHub</div>
-    </div>
-
-    <div class="tabs">
-        <div class="tab active" data-tab="storeTab" id="tabStore">⟡ TERMÉKEK</div>
-        <div class="tab" data-tab="communityTab" id="tabCommunity">⟡ KÖZÖSSÉG</div>
-    </div>
-
-    <div id="tabsContent">
-        <div id="storeTab" class="active">
-            <div class="search-filter-bar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Keresés név szerint...">
-                </div>
-                <div class="filter-group" id="categoryFilters"></div>
-            </div>
-            <div id="storeList" class="grid-3"></div>
-        </div>
-        <div id="communityTab">
-            <div class="community-links">
-                <a class="community-btn" href="https://discord.gg/Ac5eRRCEgz" target="_blank"><i class="fab fa-discord"></i> Discord</a>
-                <a class="community-btn" href="https://www.youtube.com/channel/UCCHUo4oRYy2uYM8mnD_X-zg" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
-                <a class="community-btn" href="https://www.instagram.com/nex.us80/" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
-                <a class="community-btn" href="https://www.tiktok.com/@nexus_395?lang=hu-HU" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
-            </div>
-        </div>
-    </div>
-
-    <button id="licenseBtn" class="license-btn"><i class="fas fa-file-contract"></i> <span id="licenseBtnText">⚖️ LICENC & JOGI NYILATKOZAT</span></button>
-</div>
-
-<div id="licenseModal" class="overlay">
-    <div class="modal-card">
-        <h4><i class="fas fa-file-contract"></i> <span id="licenseTitle">Szoftverlicenc és Jogi nyilatkozat</span></h4>
-        <div class="license-text" id="licenseContent">
-        </div>
-        <button class="close-modal" id="closeLicenseModalBtn"><span id="closeBtnText">Bezárás</span></button>
-    </div>
-</div>
-
-<div id="requirementsModal" class="overlay">
-    <div class="modal-card">
-        <h4><i class="fas fa-microchip"></i> <span id="reqTitle">Rendszerkövetelmény</span></h4>
-        <p id="requirementsText"></p>
-        <button class="close-modal" id="closeModalBtn"><span id="closeReqBtnText">Bezárás</span></button>
-    </div>
-</div>
-
-<div id="highlightTooltip" class="highlight-tooltip">
-    <h4><i class="fas fa-flask"></i> <span id="tooltipTitle">Termék infó</span></h4>
-    <p id="tooltipText"></p>
-    <button id="closeTooltipBtn" style="margin-top: 12px; background: none; border: 1px solid var(--primary); border-radius: 30px; padding: 4px 12px;"><span id="gotItText">Rendben</span></button>
-</div>
+<div class="tech-bg"><div class="gradient-orb"></div><div class="gradient-orb gradient-orb2"></div></div>
+<div class="top-bar"><div class="lang-switch" id="langSwitch"><button class="lang-btn" data-lang="hu">HU</button><button class="lang-btn" data-lang="en">EN</button></div><div class="auth-panel" id="authFixed"><div id="authStateContainer"><button id="authActionBtn" class="auth-btn"><i class="fab fa-google"></i> <span id="loginText">Belépés</span></button></div><div id="userInfoArea" style="display:none;" class="user-info"><img id="userAvatarSmall" class="user-avatar-sm" src=""><span id="userNameSmall" class="user-name"></span></div></div></div>
+<div class="wrapper"><div class="hero"><div class="logo-ring"><i class="fas fa-cube"></i></div><div class="brand">NΞXUS COLLECTIVE</div><h1>NΞXUS STORE</h1><div class="sub" id="subText">premium .exe releases • direct GitHub</div></div>
+<div class="tabs" id="mainTabs"><div class="tab active" data-tab="storeTab" id="tabStore">⟡ TERMÉKEK</div><div class="tab" data-tab="communityTab" id="tabCommunity">⟡ KÖZÖSSÉG</div><div class="tab" id="adminTabBtn" data-tab="adminTab" style="display:none;">⟡ ADMIN PANEL</div></div>
+<div id="tabsContent"><div id="storeTab" class="active"><div class="search-filter-bar"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Keresés név szerint..."></div><div class="filter-group" id="categoryFilters"></div></div><div id="storeList" class="grid-3"></div></div>
+<div id="communityTab"><div class="community-links"><a class="community-btn" href="https://discord.gg/Ac5eRRCEgz" target="_blank"><i class="fab fa-discord"></i> Discord</a><a class="community-btn" href="https://www.youtube.com/channel/UCCHUo4oRYy2uYM8mnD_X-zg" target="_blank"><i class="fab fa-youtube"></i> YouTube</a><a class="community-btn" href="https://www.instagram.com/nex.us80/" target="_blank"><i class="fab fa-instagram"></i> Instagram</a><a class="community-btn" href="https://www.tiktok.com/@nexus_395?lang=hu-HU" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a></div></div>
+<div id="adminTab"><div class="admin-panel"><h3 style="color:var(--primary); margin-bottom:1rem;"><i class="fas fa-shield-alt"></i> <span id="adminPanelTitle">Adminisztrátori felület</span></h3><div class="admin-form-grid"><div class="admin-field"><label id="labelNameHu">Név (HU)</label><input type="text" id="prodNameHu" placeholder="Pl. Rendszer optimalizáló"></div><div class="admin-field"><label id="labelNameEn">Name (EN)</label><input type="text" id="prodNameEn" placeholder="E.g. System Optimizer"></div><div class="admin-field"><label id="labelCatHu">Kategória (HU)</label><input type="text" id="prodCatHu" placeholder="Pl. Rendszereszköz"></div><div class="admin-field"><label id="labelCatEn">Category (EN)</label><input type="text" id="prodCatEn" placeholder="E.g. Utility"></div><div class="admin-field"><label id="labelUrl">GitHub URL</label><input type="text" id="prodUrl" placeholder="https://github.com/.../release.exe"></div><div class="admin-field"><label id="labelFileType">File típus</label><input type="text" id="prodFileType" value=".exe"></div><div class="admin-field"><label id="labelOs">OS</label><input type="text" id="prodOs" value="Win10/11"></div><div class="admin-field"><label id="labelPass">Jelszó (lakat)</label><input type="text" id="prodPass" value="nexus"></div><div class="admin-field"><label id="labelReqHu">Követelmény (HU)</label><textarea id="prodReqHu" rows="2"></textarea></div><div class="admin-field"><label id="labelReqEn">Requirements (EN)</label><textarea id="prodReqEn" rows="2"></textarea></div><div class="admin-field"><label id="labelInfoHu">Info szöveg (HU)</label><textarea id="prodInfoHu" rows="2"></textarea></div><div class="admin-field"><label id="labelInfoEn">Info text (EN)</label><textarea id="prodInfoEn" rows="2"></textarea></div><div class="admin-field"><label id="labelLocked">Zárolt (Locked)</label><select id="prodLocked"><option value="false">Nincs zárolva</option><option value="true">Zárolva</option></select></div></div><button id="addProductBtn" class="admin-btn"><i class="fas fa-plus"></i> <span id="addBtnText">Új kártya hozzáadása</span></button><h3 style="margin:2rem 0 1rem 0;"><i class="fas fa-edit"></i> <span id="manageTitle">Meglévő kártyák szerkesztése / törlése</span></h3><div id="adminProductList"></div></div></div></div>
+<button id="licenseBtn" class="license-btn"><i class="fas fa-file-contract"></i> <span id="licenseBtnText">⚖️ LICENC & JOGI NYILATKOZAT</span></button></div>
+<div id="licenseModal" class="overlay"><div class="modal-card"><h4><i class="fas fa-file-contract"></i> <span id="licenseTitle">Szoftverlicenc és Jogi nyilatkozat</span></h4><div class="license-text" id="licenseContent"></div><button class="close-modal" id="closeLicenseModalBtn"><span id="closeBtnText">Bezárás</span></button></div></div>
+<div id="requirementsModal" class="overlay"><div class="modal-card"><h4><i class="fas fa-microchip"></i> <span id="reqTitle">Rendszerkövetelmény</span></h4><p id="requirementsText"></p><button class="close-modal" id="closeModalBtn"><span id="closeReqBtnText">Bezárás</span></button></div></div>
+<div id="highlightTooltip" class="highlight-tooltip"><h4><i class="fas fa-flask"></i> <span id="tooltipTitle">Termék infó</span></h4><p id="tooltipText"></p><button id="closeTooltipBtn" style="margin-top:12px; background:none; border:1px solid var(--primary); border-radius:30px; padding:4px 12px;"><span id="gotItText">Rendben</span></button></div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyANzkn08nF3-_Dsg19wscz67dYRPk8pMgY",
-        authDomain: "nexus-08.firebaseapp.com",
-        projectId: "nexus-08",
-        storageBucket: "nexus-08.firebasestorage.app",
-        messagingSenderId: "1066992373942",
-        appId: "1:1066992373942:web:cbc354f288a5c351e25617",
-        measurementId: "G-5E16CRZ0MF"
-    };
+    // ----- TITKOSÍTÁS -----
+    const AUTHORIZED_EMAIL_HASH = "2c6a6b9e6c7b8f4a3d2e1f0c9b8a7d6e5f4c3b2a1d0e9f8c7b6a5d4e3f2c1b0a9";
+    const ADMIN_PASSWORD_HASH = "d2c3e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4";
+    async function hashText(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text.trim().toLowerCase());
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+    const firebaseConfig = { apiKey: "AIzaSyANzkn08nF3-_Dsg19wscz67dYRPk8pMgY", authDomain: "nexus-08.firebaseapp.com", projectId: "nexus-08", storageBucket: "nexus-08.firebasestorage.app", messagingSenderId: "1066992373942", appId: "1:1066992373942:web:cbc354f288a5c351e25617", measurementId: "G-5E16CRZ0MF" };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const provider = new firebase.auth.GoogleAuthProvider();
-
-    const products = [
+    
+    let products = [
         { id: "nexus_utility_tool", githubUrl: "https://github.com/nexus-the-power/nexus-exe-store/releases/download/exe/NexusHelper-V1.exe", price: "Free", fileType: ".exe", os: "Win10/11", pass: "nexus", locked: false, category: {hu:"Rendszereszköz", en:"Utility"}, name: {hu:"Windows segédprogram", en:"Windows Utility Tool"}, requirements: {hu:"🔧 Nincs szükség külső függőségre. Windows 10/11 rendszeren fut.", en:"🔧 No additional dependencies required. Runs on Windows 10/11."}, infoText: {hu:"Könnyű rendszersegéd: temp fájlok tisztítása, RAM optimalizálás, üres mappák törlése.", en:"Lightweight system helper: temp file cleanup, RAM optimization, empty folder removal."} },
         { id: "nexus_art_generator", githubUrl: "https://github.com/nexus-the-power/nexus-exe-store/releases/download/exe/AsciiArtGenerator_Setup_V1.exe", price: "Free", fileType: ".exe", os: "Win10/11", pass: "nexus", locked: false, category: {hu:"Grafika", en:"Graphics"}, name: {hu:"ASCII Art generátor", en:"ASCII Art Generator"}, requirements: {hu:"⚠️ .NET Desktop Runtime 10.0 szükséges.<br>📥 https://dotnet.microsoft.com/download/dotnet/10.0", en:"⚠️ .NET Desktop Runtime 10.0 required.<br>📥 https://dotnet.microsoft.com/download/dotnet/10.0"}, infoText: {hu:"Képek (JPG, PNG) átalakítása ASCII karakterekké. Állítható szélesség, invertálás.", en:"Convert images (JPG, PNG) to ASCII characters. Adjustable width, invert, copy to clipboard."} },
         { id: "nexus_password_generator", githubUrl: "https://github.com/nexus-the-power/nexus-exe-store/releases/download/exe/NexusPasswordGeneratorSETUP.exe", price: "Free", fileType: ".exe", os: "Win10/11", pass: "nexus", locked: false, category: {hu:"Jelszó", en:"Password"}, name: {hu:"Jelszó generátor", en:"Password generator"}, requirements: {hu:"⚠️ .NET Desktop Runtime 10.0 szükséges.<br>📥 https://dotnet.microsoft.com/download/dotnet/10.0", en:"⚠️ .NET Desktop Runtime 10.0 required.<br>📥 https://dotnet.microsoft.com/download/dotnet/10.0"}, infoText: {hu:"Biztonságos, egyedi jelszavak generálása (6-48 karakter, speciális jelekkel), valós idejű erősségjelzővel.", en:"Generate secure, unique passwords (6-48 characters, including special characters) with real-time strength indicator."} },
     ];
-
+    function saveProducts() { localStorage.setItem('nexus_products_secure', JSON.stringify(products)); }
+    function loadProducts() { const saved = localStorage.getItem('nexus_products_secure'); if(saved) products = JSON.parse(saved); else saveProducts(); }
+    loadProducts();
+    
     let currentLang = localStorage.getItem('nexusLang') || 'hu';
     const translations = {
-        hu: {
-            login: "Belépés", logout: "Kilépés", loginGoogle: "Belépés Google-lel",
-            tabStore: "⟡ TERMÉKEK", tabCommunity: "⟡ KÖZÖSSÉG",
-            sub: "premium .exe releases • direct GitHub",
-            searchPlaceholder: "Keresés név szerint...", filterAll: "Összes",
-            download: "LETÖLTÉS", locked: "ZÁROLT", reqBtn: "Köv.", copy: "Másol", share: "Megoszt", info: "Info",
-            noResults: "Nincs találat. Próbálj másik kifejezést.",
-            licenseBtn: "⚖️ LICENC & JOGI NYILATKOZAT",
-            licenseTitle: "Szoftverlicenc és Jogi nyilatkozat",
-            licenseText: `<p><strong>Version 2.0 – Kutatási és Fejlesztési Licenc</strong><br>Utolsó frissítés: 2025. április</p>
-            <p><strong>1. Cél</strong><br>Kizárólag oktatási, tesztelési és kutatási célokra. Nem tartalmaz rosszindulatú kódot.</p>
-            <p><strong>2. Felelősség kizárása</strong><br>A szoftvert „AHOGY VAN” biztosítjuk, minden garancia nélkül.</p>
-            <p><strong>3. Felhasználói felelősség</strong><br>A felhasználó köteles betartani a helyi törvényeket, és megfelelő biztonsági környezetben tesztelni.</p>
-            <p><strong>4. Szellemi tulajdon</strong><br>A „NEXUS Collective” védjegy és a szoftver szerzői jogvédelem alatt áll.</p>
-            <p><strong>5. Téves pozitív riasztások</strong><br>Az alkalmazás fejlesztői eszközök miatt egyes antivírusok gyanúsíthatják. Ellenőrzött, nem tartalmaz fenyegetést.</p>
-            <p><strong>6. Adatvédelem</strong><br>A szoftver NEM gyűjt személyes adatot. Nincs telemetria.</p>
-            <p><strong>7. Licenc elfogadása</strong><br>Letöltéssel és használattal elfogadja a feltételeket. © 2025 NEXUS Collective.<br>Kapcsolat: nexus.collective.contact@gmail.com</p>`,
-            close: "Bezárás", reqTitle: "Rendszerkövetelmény", tooltipTitle: "Termék infó", gotIt: "Rendben",
-            toastCopied: " link másolva", toastDownload: " letöltés indítása", toastLocked: "🔒 Zárt tartalom", toastNoLink: "🔒 Nincs elérhető link", toastShare: "✨ Megosztva", toastShareFail: "⚠️ Megosztás sikertelen", toastCopyFail: "❌ Másolás sikertelen", passwordAlert: (p) => `Jelszó: ${p}\nHa a Windows blokkolja, tiltsd le az Smart App Control-t.`
-        },
-        en: {
-            login: "Login", logout: "Logout", loginGoogle: "Login with Google",
-            tabStore: "⟡ PRODUCTS", tabCommunity: "⟡ COMMUNITY",
-            sub: "premium .exe releases • direct GitHub",
-            searchPlaceholder: "Search by name...", filterAll: "All",
-            download: "DOWNLOAD", locked: "LOCKED", reqBtn: "Req.", copy: "Copy", share: "Share", info: "Info",
-            noResults: "No results. Try another keyword.",
-            licenseBtn: "⚖️ LICENSE & DISCLAIMER",
-            licenseTitle: "Software License & Disclaimer",
-            licenseText: `<p><strong>Version 2.0 – Research & Development License</strong><br>Last updated: April 2025</p>
-            <p><strong>1. Purpose</strong><br>For educational, testing and research purposes only. Contains no malicious code.</p>
-            <p><strong>2. Disclaimer</strong><br>The Software is provided "AS IS", without any warranty.</p>
-            <p><strong>3. User Responsibility</strong><br>User must comply with local laws and test in a secure environment.</p>
-            <p><strong>4. Intellectual Property</strong><br>"NEXUS Collective" trademark and software are copyrighted.</p>
-            <p><strong>5. False Positives</strong><br>Due to development tools, some antivirus may flag the file. It is verified and threat-free.</p>
-            <p><strong>6. Privacy</strong><br>The Software does NOT collect personal data. No telemetry.</p>
-            <p><strong>7. Acceptance</strong><br>By downloading and using, you accept the terms. © 2025 NEXUS Collective.<br>Contact: nexus.collective.contact@gmail.com</p>`,
-            close: "Close", reqTitle: "System Requirements", tooltipTitle: "Product Info", gotIt: "Got it",
-            toastCopied: " link copied", toastDownload: " download started", toastLocked: "🔒 Locked content", toastNoLink: "🔒 No link available", toastShare: "✨ Shared", toastShareFail: "⚠️ Sharing failed", toastCopyFail: "❌ Copy failed", passwordAlert: (p) => `Password: ${p}\nIf Windows blocks the app, disable Smart App Control.`
-        }
+        hu: { login:"Belépés", logout:"Kilépés", loginGoogle:"Belépés Google-lel", filterAll:"Összes", download:"LETÖLTÉS", locked:"ZÁROLT", reqBtn:"Köv.", copy:"Másol", share:"Megoszt", info:"Info", noResults:"Nincs találat. Próbálj másik kifejezést.", passwordAlert:(p)=>`Jelszó: ${p}\nHa a Windows blokkolja, tiltsd le az Smart App Control-t.`, toastCopied:" link másolva", toastDownload:" letöltés indítása", toastLocked:"🔒 Zárt tartalom", toastNoLink:"🔒 Nincs elérhető link", toastShare:"✨ Megosztva", toastShareFail:"⚠️ Megosztás sikertelen", toastCopyFail:"❌ Másolás sikertelen", close:"Bezárás", reqTitle:"Rendszerkövetelmény", tooltipTitle:"Termék infó", gotIt:"Rendben", licenseTitle:"Szoftverlicenc és Jogi nyilatkozat", licenseBtn:"⚖️ LICENC & JOGI NYILATKOZAT", subText:"premium .exe releases • direct GitHub", searchPlaceholder:"Keresés név szerint...", tabStore:"⟡ TERMÉKEK", tabCommunity:"⟡ KÖZÖSSÉG", adminPanelTitle:"Adminisztrátori felület", addBtnText:"Új kártya hozzáadása", manageTitle:"Meglévő kártyák szerkesztése / törlése", labelNameHu:"Név (HU)", labelNameEn:"Name (EN)", labelCatHu:"Kategória (HU)", labelCatEn:"Category (EN)", labelUrl:"GitHub URL", labelFileType:"File típus", labelOs:"OS", labelPass:"Jelszó (lakat)", labelReqHu:"Követelmény (HU)", labelReqEn:"Requirements (EN)", labelInfoHu:"Info szöveg (HU)", labelInfoEn:"Info text (EN)", labelLocked:"Zárolt (Locked)" },
+        en: { login:"Login", logout:"Logout", loginGoogle:"Login with Google", filterAll:"All", download:"DOWNLOAD", locked:"LOCKED", reqBtn:"Req.", copy:"Copy", share:"Share", info:"Info", noResults:"No results. Try another keyword.", passwordAlert:(p)=>`Password: ${p}\nIf Windows blocks the app, disable Smart App Control.`, toastCopied:" link copied", toastDownload:" download started", toastLocked:"🔒 Locked content", toastNoLink:"🔒 No link available", toastShare:"✨ Shared", toastShareFail:"⚠️ Sharing failed", toastCopyFail:"❌ Copy failed", close:"Close", reqTitle:"System Requirements", tooltipTitle:"Product Info", gotIt:"Got it", licenseTitle:"Software License & Disclaimer", licenseBtn:"⚖️ LICENSE & DISCLAIMER", subText:"premium .exe releases • direct GitHub", searchPlaceholder:"Search by name...", tabStore:"⟡ PRODUCTS", tabCommunity:"⟡ COMMUNITY", adminPanelTitle:"Administrator Panel", addBtnText:"Add new card", manageTitle:"Edit / Delete existing cards", labelNameHu:"Name (HU)", labelNameEn:"Name (EN)", labelCatHu:"Category (HU)", labelCatEn:"Category (EN)", labelUrl:"GitHub URL", labelFileType:"File type", labelOs:"OS", labelPass:"Password (lock)", labelReqHu:"Requirements (HU)", labelReqEn:"Requirements (EN)", labelInfoHu:"Info text (HU)", labelInfoEn:"Info text (EN)", labelLocked:"Locked" }
     };
-
-    function t(key, param = null) { let text = translations[currentLang][key]; if (param && typeof text === 'function') return text(param); return text || key; }
-
-    let activeCategory = "all";
-    let searchQuery = "";
-
-    function showToast(msg, isError = false) {
-        let tDiv = document.querySelector('.toast-msg');
-        if (tDiv) tDiv.remove();
-        let d = document.createElement('div');
-        d.className = 'toast-msg';
-        d.innerText = msg;
-        d.style.background = isError ? '#6a1e3ccc' : '#0f2a3ecc';
-        document.body.appendChild(d);
-        setTimeout(() => { d.style.opacity = '0'; setTimeout(() => d.remove(), 400); }, 2300);
-    }
-
-    async function copyToClipboard(url, name) {
-        try { await navigator.clipboard.writeText(url); showToast(`${name}${t('toastCopied')}`); } 
-        catch(e) { showToast(t('toastCopyFail'), true); }
-    }
-
-    async function shareLink(url, name) {
-        if (navigator.share) {
-            try { await navigator.share({ title: `${name} - NEXUS`, text: `Download ${name} for free!`, url }); showToast(t('toastShare')); } 
-            catch(e) { if (e.name !== 'AbortError') showToast(t('toastShareFail'), true); }
-        } else { await copyToClipboard(url, name); }
-    }
-
-    async function fetchDownloadCount(githubUrl) {
-        if (!githubUrl || githubUrl === '#') return null;
-        try {
-            const urlObj = new URL(githubUrl);
-            const parts = urlObj.pathname.split('/');
-            const owner = parts[1], repo = parts[2], filename = parts[parts.length - 1];
-            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases`;
-            const resp = await fetch(apiUrl);
-            if (!resp.ok) throw new Error();
-            const releases = await resp.json();
-            for (let rel of releases) {
-                let asset = rel.assets.find(a => a.name === filename);
-                if (asset) return asset.download_count;
-            }
-            return 0;
-        } catch (e) { return null; }
-    }
-
-    function buildCategoryFilters() {
-        const categoriesSet = new Set(products.map(p => p.category[currentLang]));
-        const filterContainer = document.getElementById('categoryFilters');
-        if (!filterContainer) return;
-        let html = `<div class="filter-chip ${activeCategory === 'all' ? 'active' : ''}" data-category="all">${t('filterAll')}</div>`;
-        for (let cat of categoriesSet) {
-            html += `<div class="filter-chip ${activeCategory === cat ? 'active' : ''}" data-category="${cat}">${cat}</div>`;
-        }
-        filterContainer.innerHTML = html;
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                activeCategory = chip.getAttribute('data-category');
-                renderFilteredStore();
-                buildCategoryFilters();
-            });
-        });
-    }
-
-    function initSearch() {
-        const searchInput = document.getElementById('searchInput');
-        if (!searchInput) return;
-        searchInput.placeholder = t('searchPlaceholder');
-        searchInput.addEventListener('input', (e) => {
-            searchQuery = e.target.value.toLowerCase();
-            renderFilteredStore();
-        });
-    }
-
-    async function renderFilteredStore() {
-        const container = document.getElementById('storeList');
-        if (!container) return;
-        let filtered = products.filter(prod => {
-            const prodName = prod.name[currentLang].toLowerCase();
-            const prodCategory = prod.category[currentLang];
-            const matchCategory = (activeCategory === 'all' || prodCategory === activeCategory);
-            const matchSearch = prodName.includes(searchQuery);
-            return matchCategory && matchSearch;
-        });
-        if (filtered.length === 0) {
-            container.innerHTML = `<div class="no-results"><i class="fas fa-box-open"></i> ${t('noResults')}</div>`;
-            return;
-        }
-        container.innerHTML = '';
-        for (const prod of filtered) {
-            const card = document.createElement('div');
-            card.className = 'glass-card';
-            if (prod.locked) card.classList.add('locked-card');
-            card.setAttribute('data-info', prod.infoText[currentLang]);
-            let downloadCount = null;
-            if (!prod.locked && prod.githubUrl && prod.githubUrl !== '#') {
-                downloadCount = await fetchDownloadCount(prod.githubUrl);
-            }
-            const passHtml = !prod.locked ? `<button class="pass-btn" data-pass="${prod.pass}" title="Password"><i class="fas fa-lock"></i></button>` : `<button class="pass-btn" disabled style="opacity:0.4;"><i class="fas fa-hourglass-half"></i></button>`;
-            const downloadBtn = !prod.locked ? `<button class="btn-download" data-url="${prod.githubUrl}" data-name="${prod.name[currentLang]}"><i class="fas fa-download"></i> ${t('download')}</button>` : `<button class="btn-download" disabled style="background:#2a2a44; cursor:not-allowed;"><i class="fas fa-lock"></i> ${t('locked')}</button>`;
-            const reqBtn = !prod.locked ? `<button class="btn-requirements requirements-btn" data-req="${prod.requirements[currentLang].replace(/"/g, '&quot;')}"><i class="fas fa-info-circle"></i> ${t('reqBtn')}</button>` : '';
-            const countHtml = (downloadCount !== null && !prod.locked) ? `<div class="download-count"><i class="fas fa-chart-simple"></i> ${downloadCount} downloads</div>` : '';
-            card.innerHTML = `
-                <div class="category-badge"><i class="fas fa-tag"></i> ${prod.category[currentLang]}</div>
-                <div class="card-header"><h2>${escapeHtml(prod.name[currentLang])}</h2></div>
-                <div class="product-details">
-                    <span class="price-badge"><i class="fas fa-gem"></i> Free</span>
-                    <span class="file-type"><i class="fas fa-file-code"></i> ${prod.fileType}</span>
-                    <span class="os-badge"><i class="fab fa-windows"></i> ${prod.os}</span>
-                    ${passHtml}
-                </div>
-                <div class="button-group">${downloadBtn} ${reqBtn}</div>
-                ${countHtml}
-                <div class="secondary-actions">
-                    <button class="icon-btn copy-link-btn" data-url="${prod.githubUrl}" data-name="${prod.name[currentLang]}"><i class="fas fa-copy"></i> <span>${t('copy')}</span></button>
-                    <button class="icon-btn share-btn" data-url="${prod.githubUrl}" data-name="${prod.name[currentLang]}"><i class="fas fa-share-alt"></i> <span>${t('share')}</span></button>
-                    <button class="highlight-btn" data-name="${prod.name[currentLang]}"><i class="fas fa-circle-info"></i> ${t('info')}</button>
-                </div>
-            `;
+    function t(key, p=null){ let txt=translations[currentLang][key]; if(p && typeof txt==='function') return txt(p); return txt || key; }
+    
+    let activeCategory="all", searchQuery="";
+    function showToast(msg, isError=false){ let d=document.createElement('div'); d.className='toast-msg'; d.innerText=msg; d.style.background=isError?'#6a1e3ccc':'#0f2a3ecc'; document.body.appendChild(d); setTimeout(()=>{ d.style.opacity='0'; setTimeout(()=>d.remove(),400); },2300); }
+    function escapeHtml(s){ return s.replace(/[&<>]/g,function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
+    
+    async function renderStore(){
+        const container=document.getElementById('storeList'); if(!container) return;
+        let filtered=products.filter(p=>p.name[currentLang].toLowerCase().includes(searchQuery) && (activeCategory==='all' || p.category[currentLang]===activeCategory));
+        if(filtered.length===0){ container.innerHTML=`<div class="no-results"><i class="fas fa-box-open"></i> ${t('noResults')}</div>`; return; }
+        container.innerHTML='';
+        for(const prod of filtered){
+            const card=document.createElement('div'); card.className='glass-card'; if(prod.locked) card.classList.add('locked-card'); card.setAttribute('data-info',prod.infoText[currentLang]);
+            const passHtml=!prod.locked?`<button class="pass-btn" data-pass="${prod.pass}"><i class="fas fa-lock"></i></button>`:`<button class="pass-btn" disabled style="opacity:0.4;"><i class="fas fa-hourglass-half"></i></button>`;
+            const downloadBtn=!prod.locked?`<button class="btn-download" data-url="${prod.githubUrl}" data-name="${prod.name[currentLang]}"><i class="fas fa-download"></i> ${t('download')}</button>`:`<button class="btn-download" disabled style="background:#2a2a44;cursor:not-allowed;"><i class="fas fa-lock"></i> ${t('locked')}</button>`;
+            const reqBtn=!prod.locked?`<button class="btn-requirements requirements-btn" data-req="${escapeHtml(prod.requirements[currentLang])}"><i class="fas fa-info-circle"></i> ${t('reqBtn')}</button>`:'';
+            card.innerHTML=`<div class="category-badge"><i class="fas fa-tag"></i> ${prod.category[currentLang]}</div><div class="card-header"><h2>${escapeHtml(prod.name[currentLang])}</h2></div><div class="product-details"><span class="price-badge"><i class="fas fa-gem"></i> Free</span><span class="file-type"><i class="fas fa-file-code"></i> ${prod.fileType}</span><span class="os-badge"><i class="fab fa-windows"></i> ${prod.os}</span>${passHtml}</div><div class="button-group">${downloadBtn} ${reqBtn}</div><div class="secondary-actions"><button class="icon-btn copy-link-btn" data-url="${prod.githubUrl}" data-name="${prod.name[currentLang]}"><i class="fas fa-copy"></i> <span>${t('copy')}</span></button><button class="icon-btn share-btn" data-url="${prod.githubUrl}" data-name="${prod.name[currentLang]}"><i class="fas fa-share-alt"></i> <span>${t('share')}</span></button><button class="highlight-btn" data-name="${prod.name[currentLang]}"><i class="fas fa-circle-info"></i> ${t('info')}</button></div>`;
             container.appendChild(card);
         }
         attachCardEvents();
     }
-
-    function attachCardEvents() {
-        document.querySelectorAll('.btn-download:not([disabled])').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const url = btn.getAttribute('data-url');
-                const name = btn.getAttribute('data-name');
-                if (url && url !== '#') { window.open(url, '_blank'); showToast(`${name}${t('toastDownload')}`); }
-                else showToast(t('toastLocked'), true);
-            });
-        });
-        document.querySelectorAll('.copy-link-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const url = btn.getAttribute('data-url');
-                const name = btn.getAttribute('data-name');
-                if (url && url !== '#') copyToClipboard(url, name);
-                else showToast(t('toastNoLink'), true);
-            });
-        });
-        document.querySelectorAll('.share-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const url = btn.getAttribute('data-url');
-                const name = btn.getAttribute('data-name');
-                if (url && url !== '#') shareLink(url, name);
-                else showToast(t('toastNoLink'), true);
-            });
-        });
-        document.querySelectorAll('.pass-btn:not([disabled])').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const pass = btn.getAttribute('data-pass');
-                alert(t('passwordAlert', pass));
-            });
-        });
-        document.querySelectorAll('.requirements-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const req = btn.getAttribute('data-req');
-                document.getElementById('requirementsText').innerHTML = req.replace(/\n/g, '<br>');
-                document.getElementById('requirementsModal').style.display = 'flex';
-            });
-        });
-        const tooltip = document.getElementById('highlightTooltip');
-        const tooltipText = document.getElementById('tooltipText');
-        document.querySelectorAll('.highlight-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const card = btn.closest('.glass-card');
-                if (card.classList.contains('locked-card')) { showToast(t('toastLocked'), true); return; }
-                const info = card.getAttribute('data-info');
-                tooltipText.innerHTML = info;
-                const rect = card.getBoundingClientRect();
-                let left = rect.right + 15;
-                let top = rect.top;
-                if (left + 280 > window.innerWidth) left = rect.left - 295;
-                if (top + 200 > window.innerHeight) top = window.innerHeight - 210;
-                tooltip.style.left = left + 'px';
-                tooltip.style.top = top + 'px';
-                tooltip.style.display = 'block';
-            });
-        });
-        document.getElementById('closeTooltipBtn').addEventListener('click', () => {
-            document.getElementById('highlightTooltip').style.display = 'none';
-        });
+    function attachCardEvents(){
+        document.querySelectorAll('.btn-download:not([disabled])').forEach(btn=>btn.addEventListener('click',()=>{ const url=btn.dataset.url,name=btn.dataset.name; if(url && url!=='#'){ window.open(url,'_blank'); showToast(name+t('toastDownload')); } else showToast(t('toastLocked'),true); }));
+        document.querySelectorAll('.copy-link-btn').forEach(btn=>btn.addEventListener('click',()=>{ const url=btn.dataset.url,name=btn.dataset.name; if(url && url!=='#') copyToClipboard(url,name); else showToast(t('toastNoLink'),true); }));
+        document.querySelectorAll('.share-btn').forEach(btn=>btn.addEventListener('click',()=>{ const url=btn.dataset.url,name=btn.dataset.name; if(url && url!=='#') shareLink(url,name); else showToast(t('toastNoLink'),true); }));
+        document.querySelectorAll('.pass-btn:not([disabled])').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); alert(t('passwordAlert',btn.dataset.pass)); }));
+        document.querySelectorAll('.requirements-btn').forEach(btn=>btn.addEventListener('click',()=>{ document.getElementById('requirementsText').innerHTML=btn.dataset.req; document.getElementById('requirementsModal').style.display='flex'; }));
+        document.querySelectorAll('.highlight-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ const card=btn.closest('.glass-card'); if(card.classList.contains('locked-card')){ showToast(t('toastLocked'),true); return; } const info=card.dataset.info; document.getElementById('tooltipText').innerHTML=info; const rect=card.getBoundingClientRect(); let left=rect.right+15,top=rect.top; if(left+280>window.innerWidth) left=rect.left-295; if(top+200>window.innerHeight) top=window.innerHeight-210; const tooltip=document.getElementById('highlightTooltip'); tooltip.style.left=left+'px'; tooltip.style.top=top+'px'; tooltip.style.display='block'; }));
+        document.getElementById('closeTooltipBtn').onclick=()=>document.getElementById('highlightTooltip').style.display='none';
     }
-
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-
-    function applyLanguage() {
-        document.getElementById('tabStore').innerText = t('tabStore');
-        document.getElementById('tabCommunity').innerText = t('tabCommunity');
-        document.getElementById('subText').innerText = t('sub');
-        document.getElementById('searchInput').placeholder = t('searchPlaceholder');
-        document.getElementById('licenseBtnText').innerText = t('licenseBtn');
-        document.getElementById('licenseTitle').innerText = t('licenseTitle');
-        document.getElementById('licenseContent').innerHTML = t('licenseText');
-        document.getElementById('closeBtnText').innerText = t('close');
-        document.getElementById('reqTitle').innerText = t('reqTitle');
-        document.getElementById('closeReqBtnText').innerText = t('close');
-        document.getElementById('tooltipTitle').innerText = t('tooltipTitle');
-        document.getElementById('gotItText').innerText = t('gotIt');
-        const loginSpan = document.getElementById('loginText');
-        if (loginSpan) loginSpan.innerText = auth.currentUser ? t('logout') : t('login');
-        const authBtnElem = document.getElementById('authActionBtn');
-        if (authBtnElem) {
-            if (auth.currentUser) authBtnElem.innerHTML = `<i class="fas fa-sign-out-alt"></i> ${t('logout')}`;
-            else authBtnElem.innerHTML = `<i class="fab fa-google"></i> ${t('loginGoogle')}`;
-        }
-        buildCategoryFilters();
-        renderFilteredStore();
+    async function copyToClipboard(url,name){ try{ await navigator.clipboard.writeText(url); showToast(name+t('toastCopied')); } catch(e){ showToast(t('toastCopyFail'),true); } }
+    async function shareLink(url,name){ if(navigator.share){ try{ await navigator.share({title:`${name} - NEXUS`,text:`Download ${name} for free!`,url}); showToast(t('toastShare')); } catch(e){ if(e.name!=='AbortError') showToast(t('toastShareFail'),true); } } else{ await copyToClipboard(url,name); } }
+    function buildCategoryFilters(){ const cats=[...new Set(products.map(p=>p.category[currentLang]))]; let html=`<div class="filter-chip ${activeCategory==='all'?'active':''}" data-category="all">${t('filterAll')}</div>`; cats.forEach(c=>html+=`<div class="filter-chip ${activeCategory===c?'active':''}" data-category="${c}">${c}</div>`); document.getElementById('categoryFilters').innerHTML=html; document.querySelectorAll('.filter-chip').forEach(ch=>ch.addEventListener('click',()=>{ activeCategory=ch.dataset.category; renderStore(); buildCategoryFilters(); })); }
+    document.getElementById('searchInput').addEventListener('input',e=>{ searchQuery=e.target.value.toLowerCase(); renderStore(); });
+    
+    let adminAuthorized=false, adminPasswordVerified=false;
+    async function checkAdminAccess(user){
+        if(user && user.email){ const emailHash=await hashText(user.email); if(emailHash===AUTHORIZED_EMAIL_HASH){ if(!adminPasswordVerified){ const pwd=prompt("🔐 Adminisztrátori jelszó megadása kötelező:"); if(pwd && await hashText(pwd)===ADMIN_PASSWORD_HASH){ adminPasswordVerified=true; adminAuthorized=true; } else { alert("Hibás jelszó!"); adminAuthorized=false; } } else adminAuthorized=true; } else { adminAuthorized=false; adminPasswordVerified=false; } } else { adminAuthorized=false; adminPasswordVerified=false; }
+        const adminTabBtn=document.getElementById('adminTabBtn'); if(adminTabBtn) adminTabBtn.style.display=adminAuthorized?'block':'none';
+        if(adminAuthorized) renderAdminList();
+        else if(document.getElementById('adminTab').classList.contains('active')) document.querySelector('.tab[data-tab="storeTab"]').click();
     }
-
-    function setLanguage(lang) {
-        currentLang = lang;
-        localStorage.setItem('nexusLang', lang);
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            if (btn.getAttribute('data-lang') === lang) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        applyLanguage();
+    function renderAdminList(){ const container=document.getElementById('adminProductList'); if(!container) return; container.innerHTML=products.map((p,idx)=>`<div class="admin-product-item"><div><strong>${escapeHtml(p.name.hu)}</strong> / ${escapeHtml(p.name.en)} <span style="font-size:0.7rem;background:#ffaa3322;padding:2px 8px;border-radius:20px;">${p.locked?'🔒 Zárolt':'🔓 Nyitott'}</span></div><div><button class="admin-btn" onclick="editProduct(${idx})" style="background:#ffaa33; margin-right:8px;"><i class="fas fa-edit"></i> ${currentLang==='hu'?'Szerkeszt':'Edit'}</button><button class="admin-btn" onclick="toggleLock(${idx})" style="background:#8866cc;"><i class="fas fa-lock"></i> ${currentLang==='hu'?'Zárolás/Ki':'Lock/Unlock'}</button><button class="admin-btn" onclick="deleteProduct(${idx})" style="background:#cc3366;"><i class="fas fa-trash"></i> ${currentLang==='hu'?'Törlés':'Delete'}</button></div></div>`).join(''); }
+    window.editProduct=function(idx){ const p=products[idx]; document.getElementById('prodNameHu').value=p.name.hu; document.getElementById('prodNameEn').value=p.name.en; document.getElementById('prodCatHu').value=p.category.hu; document.getElementById('prodCatEn').value=p.category.en; document.getElementById('prodUrl').value=p.githubUrl; document.getElementById('prodFileType').value=p.fileType; document.getElementById('prodOs').value=p.os; document.getElementById('prodPass').value=p.pass; document.getElementById('prodReqHu').value=p.requirements.hu; document.getElementById('prodReqEn').value=p.requirements.en; document.getElementById('prodInfoHu').value=p.infoText.hu; document.getElementById('prodInfoEn').value=p.infoText.en; document.getElementById('prodLocked').value=p.locked?"true":"false"; const addBtn=document.getElementById('addProductBtn'); addBtn.innerHTML=`<i class="fas fa-save"></i> ${currentLang==='hu'?'Módosítás mentése':'Save changes'}`; addBtn.onclick=()=>{ p.name.hu=document.getElementById('prodNameHu').value; p.name.en=document.getElementById('prodNameEn').value; p.category.hu=document.getElementById('prodCatHu').value; p.category.en=document.getElementById('prodCatEn').value; p.githubUrl=document.getElementById('prodUrl').value; p.fileType=document.getElementById('prodFileType').value; p.os=document.getElementById('prodOs').value; p.pass=document.getElementById('prodPass').value; p.requirements.hu=document.getElementById('prodReqHu').value; p.requirements.en=document.getElementById('prodReqEn').value; p.infoText.hu=document.getElementById('prodInfoHu').value; p.infoText.en=document.getElementById('prodInfoEn').value; p.locked=document.getElementById('prodLocked').value==='true'; saveProducts(); renderStore(); buildFilters(); renderAdminList(); addBtn.innerHTML=`<i class="fas fa-plus"></i> ${currentLang==='hu'?'Új kártya hozzáadása':'Add new card'}`; addBtn.onclick=addNewProduct; document.querySelectorAll('#adminTab input, #adminTab textarea, #adminTab select').forEach(i=>i.value=''); showToast(currentLang==='hu'?'Termék módosítva!':'Product updated!'); }; };
+    window.toggleLock=function(idx){ products[idx].locked=!products[idx].locked; saveProducts(); renderStore(); renderAdminList(); showToast(`${currentLang==='hu'?'Zárolás állapot':'Lock status'}: ${products[idx].locked?(currentLang==='hu'?'ZÁROLT':'LOCKED'):(currentLang==='hu'?'NYITOTT':'OPEN')}`); };
+    window.deleteProduct=function(idx){ if(confirm(currentLang==='hu'?'Biztosan törlöd?':'Are you sure?')){ products.splice(idx,1); saveProducts(); renderStore(); buildFilters(); renderAdminList(); showToast(currentLang==='hu'?'Törölve':'Deleted'); } };
+    function addNewProduct(){ const newProd={ id:"prod_"+Date.now(), githubUrl:document.getElementById('prodUrl').value, price:"Free", fileType:document.getElementById('prodFileType').value, os:document.getElementById('prodOs').value, pass:document.getElementById('prodPass').value, locked:document.getElementById('prodLocked').value==='true', category:{ hu:document.getElementById('prodCatHu').value, en:document.getElementById('prodCatEn').value }, name:{ hu:document.getElementById('prodNameHu').value, en:document.getElementById('prodNameEn').value }, requirements:{ hu:document.getElementById('prodReqHu').value, en:document.getElementById('prodReqEn').value }, infoText:{ hu:document.getElementById('prodInfoHu').value, en:document.getElementById('prodInfoEn').value } }; if(!newProd.name.hu || !newProd.name.en){ showToast(currentLang==='hu'?'Név megadása kötelező!':'Name is required!',true); return; } products.push(newProd); saveProducts(); renderStore(); buildFilters(); renderAdminList(); document.querySelectorAll('#adminTab input, #adminTab textarea, #adminTab select').forEach(i=>i.value=''); showToast(currentLang==='hu'?'Új kártya hozzáadva!':'New card added!'); }
+    document.getElementById('addProductBtn').onclick=addNewProduct;
+    
+    function applyLanguage(){
+        document.getElementById('tabStore').innerText=t('tabStore'); document.getElementById('tabCommunity').innerText=t('tabCommunity'); document.getElementById('subText').innerText=t('subText'); document.getElementById('searchInput').placeholder=t('searchPlaceholder'); document.getElementById('licenseBtnText').innerText=t('licenseBtn'); document.getElementById('licenseTitle').innerText=t('licenseTitle'); document.getElementById('closeBtnText').innerText=t('close'); document.getElementById('reqTitle').innerText=t('reqTitle'); document.getElementById('closeReqBtnText').innerText=t('close'); document.getElementById('tooltipTitle').innerText=t('tooltipTitle'); document.getElementById('gotItText').innerText=t('gotIt'); document.getElementById('adminPanelTitle').innerText=t('adminPanelTitle'); document.getElementById('addBtnText').innerText=t('addBtnText'); document.getElementById('manageTitle').innerText=t('manageTitle'); document.getElementById('labelNameHu').innerText=t('labelNameHu'); document.getElementById('labelNameEn').innerText=t('labelNameEn'); document.getElementById('labelCatHu').innerText=t('labelCatHu'); document.getElementById('labelCatEn').innerText=t('labelCatEn'); document.getElementById('labelUrl').innerText=t('labelUrl'); document.getElementById('labelFileType').innerText=t('labelFileType'); document.getElementById('labelOs').innerText=t('labelOs'); document.getElementById('labelPass').innerText=t('labelPass'); document.getElementById('labelReqHu').innerText=t('labelReqHu'); document.getElementById('labelReqEn').innerText=t('labelReqEn'); document.getElementById('labelInfoHu').innerText=t('labelInfoHu'); document.getElementById('labelInfoEn').innerText=t('labelInfoEn'); document.getElementById('labelLocked').innerText=t('labelLocked');
+        const licenseFullTextHu=`<p><strong>Version 2.0 – Kutatási és Fejlesztési Licenc</strong><br>Utolsó frissítés: 2025. április</p><p><strong>1. Cél</strong><br>Kizárólag oktatási, tesztelési és kutatási célokra. Nem tartalmaz rosszindulatú kódot.</p><p><strong>2. Felelősség kizárása</strong><br>A szoftvert „AHOGY VAN” biztosítjuk, minden garancia nélkül.</p><p><strong>3. Felhasználói felelősség</strong><br>A felhasználó köteles betartani a helyi törvényeket, és megfelelő biztonsági környezetben tesztelni.</p><p><strong>4. Szellemi tulajdon</strong><br>A „NEXUS Collective” védjegy és a szoftver szerzői jogvédelem alatt áll.</p><p><strong>5. Téves pozitív riasztások</strong><br>Az alkalmazás fejlesztői eszközök miatt egyes antivírusok gyanúsíthatják. Ellenőrzött, nem tartalmaz fenyegetést.</p><p><strong>6. Adatvédelem</strong><br>A szoftver NEM gyűjt személyes adatot. Nincs telemetria.</p><p><strong>7. Licenc elfogadása</strong><br>Letöltéssel és használattal elfogadja a feltételeket. © 2025 NEXUS Collective.<br>Kapcsolat: nexus.collective.contact@gmail.com</p>`;
+        const licenseFullTextEn=`<p><strong>Version 2.0 – Research & Development License</strong><br>Last updated: April 2025</p><p><strong>1. Purpose</strong><br>For educational, testing and research purposes only. Contains no malicious code.</p><p><strong>2. Disclaimer</strong><br>The Software is provided "AS IS", without any warranty.</p><p><strong>3. User Responsibility</strong><br>User must comply with local laws and test in a secure environment.</p><p><strong>4. Intellectual Property</strong><br>"NEXUS Collective" trademark and software are copyrighted.</p><p><strong>5. False Positives</strong><br>Due to development tools, some antivirus may flag the file. It is verified and threat-free.</p><p><strong>6. Privacy</strong><br>The Software does NOT collect personal data. No telemetry.</p><p><strong>7. Acceptance</strong><br>By downloading and using, you accept the terms. © 2025 NEXUS Collective.<br>Contact: nexus.collective.contact@gmail.com</p>`;
+        document.getElementById('licenseContent').innerHTML = currentLang==='hu' ? licenseFullTextHu : licenseFullTextEn;
+        const loginSpan=document.getElementById('loginText'); if(loginSpan) loginSpan.innerText=auth.currentUser?t('logout'):t('login');
+        const authBtnElem=document.getElementById('authActionBtn'); if(authBtnElem){ if(auth.currentUser) authBtnElem.innerHTML=`<i class="fas fa-sign-out-alt"></i> ${t('logout')}`; else authBtnElem.innerHTML=`<i class="fab fa-google"></i> ${t('loginGoogle')}`; }
+        buildCategoryFilters(); renderStore();
     }
-
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang')));
-    });
-
-    const authBtn = document.getElementById('authActionBtn');
-    const userInfoArea = document.getElementById('userInfoArea');
-    const userAvatarSmall = document.getElementById('userAvatarSmall');
-    const userNameSmall = document.getElementById('userNameSmall');
-
-    function updateAuthUI(user) {
-        if (user) {
-            authBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> ${t('logout')}`;
-            authBtn.onclick = () => auth.signOut();
-            userInfoArea.style.display = 'flex';
-            userAvatarSmall.src = user.photoURL || 'https://placehold.co/40x40/0a1220/cyan?text=U';
-            userNameSmall.innerText = user.displayName || user.email?.split('@')[0] || (currentLang === 'hu' ? 'Felhasználó' : 'User');
-        } else {
-            authBtn.innerHTML = `<i class="fab fa-google"></i> ${t('loginGoogle')}`;
-            authBtn.onclick = () => auth.signInWithPopup(provider).catch(err => showToast(`Login error: ${err.message}`, true));
-            userInfoArea.style.display = 'none';
-        }
+    function setLanguage(lang){ currentLang=lang; localStorage.setItem('nexusLang',lang); document.querySelectorAll('.lang-btn').forEach(btn=>{ if(btn.dataset.lang===lang) btn.classList.add('active'); else btn.classList.remove('active'); }); applyLanguage(); }
+    document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',()=>setLanguage(btn.dataset.lang)));
+    
+    const authBtn=document.getElementById('authActionBtn'), userInfoArea=document.getElementById('userInfoArea'), userAvatarSmall=document.getElementById('userAvatarSmall'), userNameSmall=document.getElementById('userNameSmall');
+    function updateAuthUI(user){
+        if(user){ authBtn.innerHTML=`<i class="fas fa-sign-out-alt"></i> ${t('logout')}`; authBtn.onclick=()=>auth.signOut(); userInfoArea.style.display='flex'; userAvatarSmall.src=user.photoURL||'https://placehold.co/40x40/0a1220/cyan?text=U'; userNameSmall.innerText=user.displayName||user.email?.split('@')[0]||(currentLang==='hu'?'Felhasználó':'User'); checkAdminAccess(user); }
+        else{ authBtn.innerHTML=`<i class="fab fa-google"></i> ${t('loginGoogle')}`; authBtn.onclick=()=>auth.signInWithPopup(provider).catch(err=>showToast(`Login error: ${err.message}`,true)); userInfoArea.style.display='none'; adminAuthorized=false; adminPasswordVerified=false; document.getElementById('adminTabBtn').style.display='none'; }
     }
     auth.onAuthStateChanged(updateAuthUI);
-
-    const tabs = document.querySelectorAll('.tab');
-    const contents = document.querySelectorAll('#tabsContent > div');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabId = tab.getAttribute('data-tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            contents.forEach(c => c.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-        });
-    });
-
-    const licenseModal = document.getElementById('licenseModal');
-    const licenseBtnElem = document.getElementById('licenseBtn');
-    const closeLicenseModalBtn = document.getElementById('closeLicenseModalBtn');
-    licenseBtnElem.addEventListener('click', () => licenseModal.style.display = 'flex');
-    closeLicenseModalBtn.addEventListener('click', () => licenseModal.style.display = 'none');
-    licenseModal.addEventListener('click', (e) => { if (e.target === licenseModal) licenseModal.style.display = 'none'; });
-    const reqModal = document.getElementById('requirementsModal');
-    const closeReqModalBtn = document.getElementById('closeModalBtn');
-    closeReqModalBtn.addEventListener('click', () => reqModal.style.display = 'none');
-    reqModal.addEventListener('click', (e) => { if (e.target === reqModal) reqModal.style.display = 'none'; });
-
+    
+    document.querySelectorAll('.tab').forEach(tab=>{ tab.addEventListener('click',()=>{ const tabId=tab.dataset.tab; if(tabId==='adminTab' && !adminAuthorized){ showToast(t('toastLocked'),true); return; } document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('#tabsContent>div').forEach(c=>c.classList.remove('active')); document.getElementById(tabId).classList.add('active'); if(tabId==='adminTab' && adminAuthorized) renderAdminList(); }); });
+    document.getElementById('licenseBtn').addEventListener('click',()=>document.getElementById('licenseModal').style.display='flex');
+    document.getElementById('closeLicenseModalBtn').addEventListener('click',()=>document.getElementById('licenseModal').style.display='none');
+    document.getElementById('closeModalBtn').addEventListener('click',()=>document.getElementById('requirementsModal').style.display='none');
+    document.getElementById('licenseModal').addEventListener('click',(e)=>{ if(e.target===document.getElementById('licenseModal')) document.getElementById('licenseModal').style.display='none'; });
+    document.getElementById('requirementsModal').addEventListener('click',(e)=>{ if(e.target===document.getElementById('requirementsModal')) document.getElementById('requirementsModal').style.display='none'; });
+    
     setLanguage(currentLang);
-    initSearch();
+    renderStore();
+    buildFilters();
 </script>
 </body>
 </html>
