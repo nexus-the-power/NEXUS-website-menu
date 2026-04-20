@@ -109,18 +109,19 @@
 <div id="highlightTooltip" class="highlight-tooltip"><h4><i class="fas fa-flask"></i> <span id="tooltipTitle">Termék infó</span></h4><p id="tooltipText"></p><button id="closeTooltipBtn" style="margin-top:12px; background:none; border:1px solid var(--primary); border-radius:30px; padding:4px 12px;"><span id="gotItText">Rendben</span></button></div>
 
 <script>
-    // ============================================================
-    // TITKOSÍTOTT ADMIN HITELESÍTÉS - CSAK HASH ÉRTÉKEK TÁROLVA
-    // A kódban SEHOL nem szerepel plain text-ben az email vagy a jelszó.
-    // ============================================================
-    // "szupgabriel67@gmail.com" SHA256 hash-e (a Te emailedből generálva)
-    const _0x3f2a = "a39e125749a51c569ac9cfdb12b1de8393df63b0ad3c7b82eb52d1a861185a04";
-    // "GabiSzuP1234.1" SHA256 hash-e (általad megadott helyes hash)
-    const _0x7b4c = "ca68c377a947f72f3879fdd96a3e99f40392abf99b6f4fc6042f51335bd70506";
+    const _emailHash = "a39e125749a51c569ac9cfdb12b1de8393df63b0ad3c7b82eb52d1a861185a04";
+    const _passHash = "ca68c377a947f72f3879fdd96a3e99f40392abf99b6f4fc6042f51335bd70506";
     
-    async function _0x1a2b(text) {
+    async function hashEmail(text) {
         const encoder = new TextEncoder();
         const data = encoder.encode(text.trim().toLowerCase());
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+    
+    async function hashPassword(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text); // NINCS toLowerCase() !!!
         const hashBuffer = await crypto.subtle.digest('SHA-256', data);
         return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
     }
@@ -184,8 +185,8 @@
     
     async function checkAdminAccess(user) {
         if (user && user.email) {
-            const emailHash = await _0x1a2b(user.email);
-            if (emailHash === _0x3f2a) {
+            const emailHash = await hashEmail(user.email);
+            if (emailHash === _emailHash) {
                 adminEmailMatched = true;
                 const adminTabBtn = document.getElementById('adminTabBtn');
                 if (adminTabBtn) adminTabBtn.style.display = 'block';
@@ -208,8 +209,8 @@
         }
         const pwd = prompt("🔐 ADMINISZTRÁTORI HITELESÍTÉS\n\nA folytatáshoz add meg a jelszót:");
         if (pwd) {
-            _0x1a2b(pwd).then(pwdHash => {
-                if (pwdHash === _0x7b4c) {
+            hashPassword(pwd).then(pwdHash => {
+                if (pwdHash === _passHash) {
                     adminAuthorized = true;
                     showToast("Admin hitelesítés sikeres!", false);
                     if (callback) callback(true);
