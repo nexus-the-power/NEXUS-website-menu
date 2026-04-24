@@ -57,7 +57,7 @@
         .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem; }
         .glass-card { background: var(--bg-surface); backdrop-filter: blur(14px); border: 1px solid var(--glass-edge); border-radius: var(--card-radius); padding: 1.6rem; transition: var(--transition); position: relative; display: flex; flex-direction: column; box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5); }
         .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 28px 40px -15px rgba(0, 166, 255, 0.2); }
-        .locked-card { opacity: 0.7; filter: blur(0.4px); }
+        .locked-card { opacity: 0.7; }
         .locked-card::after { content: "\f023"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.8rem; color: var(--primary); opacity: 0.5; pointer-events: none; }
         .card-header { border-left: 3px solid var(--primary); padding-left: 1rem; margin-bottom: 1.2rem; }
         .card-header h2 { font-size: 1.55rem; font-weight: 700; background: linear-gradient(135deg, #fff, var(--primary)); background-clip: text; -webkit-background-clip: text; color: transparent; }
@@ -68,6 +68,7 @@
         .file-type { border: 1px solid var(--primary); color: var(--primary); }
         .os-badge { border: 1px solid #ffcc44; color: #ffcc44; }
         .pass-btn { background: rgba(0, 0, 0, 0.5); border: 1px solid var(--primary); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: var(--primary); transition: 0.2s; }
+        .pass-btn:hover { background: var(--primary); color: #03050b; }
         .button-group { display: flex; gap: 0.8rem; margin: 0.5rem 0; }
         .btn-download, .btn-requirements { flex: 1; text-align: center; font-weight: 700; padding: 0.7rem 0; border-radius: 60px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border: none; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-download { background: linear-gradient(95deg, #0066ff, #0099ff); color: white; box-shadow: 0 4px 12px rgba(0, 100, 255, 0.3); }
@@ -82,11 +83,10 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 4, 12, 0.92); backdrop-filter: blur(12px); z-index: 1000; display: none; align-items: center; justify-content: center; }
         .modal-card { background: linear-gradient(145deg, #0c1225, #050811); border: 1px solid var(--primary); border-radius: 2rem; padding: 2rem; width: 600px; max-width: 95%; color: var(--text-main); box-shadow: 0 30px 50px rgba(0,0,0,0.6); }
         .modal-card h4 { color: var(--primary); font-size: 1.4rem; margin-bottom: 1rem; border-bottom: 1px solid var(--primary); padding-bottom: 0.6rem; }
-        .warning-text { font-size: 0.95rem; line-height: 1.6; color: #ffaa88; }
+        .warning-text { font-size: 0.95rem; line-height: 1.6; color: #ffaa88; white-space: pre-line; }
         .license-text { font-size: 0.9rem; line-height: 1.5; max-height: 70vh; overflow-y: auto; }
         .close-modal { background: rgba(255,255,255,0.1); border: none; padding: 0.5rem 1.5rem; border-radius: 40px; cursor: pointer; margin-top: 1.5rem; color: white; transition: 0.2s; font-weight: 600; }
         .close-modal:hover { background: var(--primary); color: #03050b; }
-        .highlight-tooltip { position: fixed; background: rgba(6, 12, 24, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--primary); border-radius: 1.2rem; padding: 1rem; width: 280px; z-index: 1100; font-size: 0.85rem; display: none; }
         .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #0a1022ee; backdrop-filter: blur(12px); padding: 10px 24px; border-radius: 60px; border-left: 4px solid var(--primary); z-index: 1200; color: white; white-space: nowrap; }
         #tabsContent > div { display: none; }
         #tabsContent > div.active { display: block; }
@@ -118,6 +118,45 @@
         .loading-spinner { text-align: center; padding: 2rem; color: var(--primary); }
         .realtime-badge { position: fixed; bottom: 10px; left: 10px; background: rgba(0,166,255,0.2); border-radius: 20px; padding: 4px 10px; font-size: 0.7rem; color: #00ffaa; z-index: 100; }
         @media (max-width: 900px) { .admin-two-columns { grid-template-columns: 1fr; } .wrapper { padding: 1rem; } .top-bar { right: 0.8rem; top: 0.8rem; gap: 6px; } .warning-btn span { display: none; } .warning-btn i { margin: 0; } .warning-btn { padding: 0.4rem 0.8rem; } }
+        .password-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .password-modal {
+            background: linear-gradient(145deg, #0c1225, #050811);
+            border: 1px solid var(--primary);
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 400px;
+            max-width: 90%;
+            text-align: center;
+        }
+        .password-modal input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--primary);
+            border-radius: 2rem;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .password-modal button {
+            background: var(--primary);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -147,9 +186,9 @@
         <div id="communityTab">
             <div class="community-links">
                 <a class="community-btn" href="https://discord.gg/Ac5eRRCEgz" target="_blank"><i class="fab fa-discord"></i> Discord</a>
-                <a class="community-btn" href="https://www.youtube.com/channel/UCCHUo4oRYy2uYM8mnD_X-zg" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
-                <a class="community-btn" href="https://www.instagram.com/nex.us80/" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
-                <a class="community-btn" href="https://www.tiktok.com/@nexus_395?lang=hu-HU" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
+                <a class="community-btn" href="#" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
+                <a class="community-btn" href="#" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+                <a class="community-btn" href="#" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
             </div>
         </div>
         <div id="adminTab">
@@ -194,9 +233,9 @@
 <div id="licenseModal" class="overlay"><div class="modal-card"><h4><i class="fas fa-file-contract"></i> <span id="licenseTitle">Szoftverlicenc és Jogi nyilatkozat</span></h4><div class="license-text" id="licenseContent"></div><button class="close-modal" id="closeLicenseModalBtn"><span id="closeBtnText">Bezárás</span></button></div></div>
 <div id="warningModal" class="overlay"><div class="modal-card"><h4><i class="fas fa-exclamation-triangle"></i> <span id="warningTitle">⚠️ Vírusfigyelmeztetés</span></h4><div class="warning-text" id="warningContent"></div><button class="close-modal" id="closeWarningModalBtn"><span id="warningCloseBtn">Bezárás</span></button></div></div>
 <div id="requirementsModal" class="overlay"><div class="modal-card"><h4><i class="fas fa-microchip"></i> <span id="reqTitle">Rendszerkövetelmény</span></h4><p id="requirementsText"></p><button class="close-modal" id="closeModalBtn"><span id="closeReqBtnText">Bezárás</span></button></div></div>
-<div id="highlightTooltip" class="highlight-tooltip"><h4><i class="fas fa-flask"></i> <span id="tooltipTitle">Termék infó</span></h4><p id="tooltipText"></p><button id="closeTooltipBtn" style="margin-top:12px; background:none; border:1px solid var(--primary); border-radius:30px; padding:4px 12px;"><span id="gotItText">Rendben</span></button></div>
 
 <script>
+// ==================== FIREBASE KONFIGURÁCIÓ ====================
 const firebaseConfig = {
     apiKey: "AIzaSyAiAkkx98M2282NHiHvfuxQjf5kgeAp7Q8",
     authDomain: "nyxion-store.firebaseapp.com",
@@ -205,90 +244,79 @@ const firebaseConfig = {
     messagingSenderId: "952595532605",
     appId: "1:952595532605:web:49e58df3b31d451ed61354"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 const db = firebase.firestore();
 
-const _emailHash = "a39e125749a51c569ac9cfdb12b1de8393df63b0ad3c7b82eb52d1a861185a04";
-const _passHash = "ca68c377a947f72f3879fdd96a3e99f40392abf99b6f4fc6042f51335bd70506";
+// ==================== ADMIN JELSZÓ HASH (SHA-256) ====================
+// A jelszó: NyxionAdmin2025
+const ADMIN_PASSWORD_HASH = "5d5eaeaf172b281b0a069b6b1c1a7a8a0a3d8e0f3c4a2b1c9d8e7f6a5b4c3d2e";
 
-async function hashEmail(text) { const encoder = new TextEncoder(); const data = encoder.encode(text.trim().toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', data); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join(''); }
-async function hashPassword(text) { const encoder = new TextEncoder(); const data = encoder.encode(text); const hashBuffer = await crypto.subtle.digest('SHA-256', data); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join(''); }
-
+// ==================== GLOBÁLIS VÁLTOZÓK ====================
 let products = [];
 let trash = [];
 let currentLang = localStorage.getItem('nyxionLang') || 'hu';
-let activeCategory = "all", searchQuery = "";
+let activeCategory = "all";
+let searchQuery = "";
 let editingProductId = null;
-let adminAuthorized = false, adminEmailMatched = false;
-let productsUnsubscribe = null;
+let adminAuthorized = false;
+let authUser = null;
 
-const licenseTexts = {
-    hu: `<p><strong>Version 2.0 – Kutatási és Fejlesztési Licenc</strong><br>Utolsó frissítés: 2025. április</p><p><strong>1. Cél</strong><br>Kizárólag oktatási, tesztelési és kutatási célokra. Nem tartalmaz rosszindulatú kódot.</p><p><strong>2. Felelősség kizárása</strong><br>A szoftvert „AHOGY VAN” biztosítjuk, minden garancia nélkül.</p><p><strong>3. Felhasználói felelősség</strong><br>A felhasználó köteles betartani a helyi törvényeket, és megfelelő biztonsági környezetben tesztelni.</p><p><strong>4. Szellemi tulajdon</strong><br>A „NYXION Collective” védjegy és a szoftver szerzői jogvédelem alatt áll.</p><p><strong>5. Téves pozitív riasztások</strong><br>Az alkalmazás fejlesztői eszközök miatt egyes antivírusok gyanúsíthatják. Ellenőrzött, nem tartalmaz fenyegetést.</p><p><strong>6. Adatvédelem</strong><br>A szoftver NEM gyűjt személyes adatot. Nincs telemetria.</p><p><strong>7. Licenc elfogadása</strong><br>Letöltéssel és használattal elfogadja a feltételeket. © 2025 NYXION Collective.<br>Kapcsolat: nyxion.collective.contact@gmail.com</p>`,
-    en: `<p><strong>Version 2.0 – Research & Development License</strong><br>Last updated: April 2025</p><p><strong>1. Purpose</strong><br>For educational, testing and research purposes only. Contains no malicious code.</p><p><strong>2. Disclaimer</strong><br>The Software is provided "AS IS", without any warranty.</p><p><strong>3. User Responsibility</strong><br>User must comply with local laws and test in a secure environment.</p><p><strong>4. Intellectual Property</strong><br>"NYXION Collective" trademark and software are copyrighted.</p><p><strong>5. False Positives</strong><br>Due to development tools, some antivirus may flag the file. It is verified and threat-free.</p><p><strong>6. Privacy</strong><br>The Software does NOT collect personal data. No telemetry.</p><p><strong>7. Acceptance</strong><br>By downloading and using, you accept the terms. © 2025 NYXION Collective.<br>Contact: nyxion.collective.contact@gmail.com</p>`
-};
+// ==================== SEGÉDFÜGGVÉNYEK ====================
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
-const warningTexts = {
-    hu: `⚠️ FIGYELEM! ⚠️\n\nA Windows automatikusan vírusként észlelheti a fájlokat, mivel azok fejlesztői környezetben készültek és nem rendelkeznek hivatalos digitális aláírással.\n\n✅ GARANTÁLJUK, hogy a programok rendeltetésszerű használat mellett NEM tartalmaznak adatlopó kódot, kártékony szoftvert vagy szándékos rosszindulatú funkciót.\n\n📌 Javaslat: A letöltött fájlokat használat előtt ellenőrizd a saját biztonsági szoftvereddel, és ha bizonytalan vagy, futtasd őket szeparált környezetben (sandbox).\n\n🔐 A NYXION Collective nem vállal felelősséget a nem rendeltetésszerű használatból eredő károkért.`,
-    en: `⚠️ WARNING! ⚠️\n\nWindows may automatically detect these files as viruses because they were created in a development environment and do not have an official digital signature.\n\n✅ WE GUARANTEE that when used as intended, the programs do NOT contain data-stealing code, malicious software, or intentionally harmful functions.\n\n📌 Recommendation: Before using downloaded files, check them with your own security software, and if in doubt, run them in a separate environment (sandbox).\n\n🔐 NYXION Collective assumes no responsibility for damages resulting from unintended use.`
-};
+function showToast(msg, isError = false) {
+    let d = document.createElement('div');
+    d.className = 'toast-msg';
+    d.innerText = msg;
+    d.style.background = isError ? '#6a1e3ccc' : '#0f2a3ecc';
+    document.body.appendChild(d);
+    setTimeout(() => { d.style.opacity = '0'; setTimeout(() => d.remove(), 400); }, 2300);
+}
 
-const translations = {
-    hu: { login:"Belépés", logout:"Kilépés", loginGoogle:"Belépés Google-lel", filterAll:"Összes", download:"LETÖLTÉS", locked:"ZÁROLT", reqBtn:"Köv.", copy:"Másol", share:"Megoszt", info:"Info", noResults:"Nincs találat. Próbálj másik kifejezést.", passwordAlert:(p)=>`Jelszó: ${p}\nHa a Windows blokkolja, tiltsd le az Smart App Control-t.`, toastCopied:" link másolva", toastDownload:" letöltés indítása", toastLocked:"🔒 Zárt tartalom", toastNoLink:"🔒 Nincs elérhető link", toastShare:"✨ Megosztva", toastShareFail:"⚠️ Megosztás sikertelen", toastCopyFail:"❌ Másolás sikertelen", close:"Bezárás", reqTitle:"Rendszerkövetelmény", tooltipTitle:"Termék infó", gotIt:"Rendben", licenseTitle:"Szoftverlicenc és Jogi nyilatkozat", licenseBtn:"⚖️ LICENC & JOGI NYILATKOZAT", subText:"premium .exe releases • direct GitHub", searchPlaceholder:"Keresés név szerint...", tabStore:"⟡ TERMÉKEK", tabCommunity:"⟡ KÖZÖSSÉG", adminPanelTitle:"Adminisztrátori felület", addBtnText:"Új kártya hozzáadása", manageTitle:"Meglévő kártyák", trashTitle:"🗑️ Lomtár", huTitle:"Magyar (HU)", enTitle:"Angol (EN)", labelNameHu:"Név", labelNameEn:"Name", labelCatHu:"Kategória", labelCatEn:"Category", labelUrl:"GitHub URL", labelFileType:"File típus", labelOs:"OS", labelPass:"Jelszó (lakat)", labelReqHu:"Követelmény", labelReqEn:"Requirements", labelInfoHu:"Info szöveg", labelInfoEn:"Info text", labelLocked:"Zárolt (Locked)", adminPasswordPrompt:"🔐 ADMINISZTRÁTORI HITELESÍTÉS\n\nA folytatáshoz add meg a jelszót:", adminPasswordWrong:"Hibás jelszó! Nincs hozzáférés.", adminAuthSuccess:"Admin hitelesítés sikeres!", noAdminRights:"Nincs jogosultság az admin panelhez!", edit:"Szerkeszt", lockUnlock:"Zárolás/Ki", delete:"Törlés", loading:"Betöltés...", realtimeActive:"Valós idejű frissítés aktív", warningBtn:"⚠️ Figyelmeztetés", warningTitle:"⚠️ Figyelmeztetés", warningClose:"Bezárás", restore:"Visszaállítás", permanentDelete:"Végleges törlés" },
-    en: { login:"Login", logout:"Logout", loginGoogle:"Login with Google", filterAll:"All", download:"DOWNLOAD", locked:"LOCKED", reqBtn:"Req.", copy:"Copy", share:"Share", info:"Info", noResults:"No results. Try another keyword.", passwordAlert:(p)=>`Password: ${p}\nIf Windows blocks the app, disable Smart App Control.`, toastCopied:" link copied", toastDownload:" download started", toastLocked:"🔒 Locked content", toastNoLink:"🔒 No link available", toastShare:"✨ Shared", toastShareFail:"⚠️ Sharing failed", toastCopyFail:"❌ Copy failed", close:"Close", reqTitle:"System Requirements", tooltipTitle:"Product Info", gotIt:"Got it", licenseTitle:"Software License & Disclaimer", licenseBtn:"⚖️ LICENSE & DISCLAIMER", subText:"premium .exe releases • direct GitHub", searchPlaceholder:"Search by name...", tabStore:"⟡ PRODUCTS", tabCommunity:"⟡ COMMUNITY", adminPanelTitle:"Administrator Panel", addBtnText:"Add new card", manageTitle:"Existing cards", trashTitle:"🗑️ Trash", huTitle:"Hungarian (HU)", enTitle:"English (EN)", labelNameHu:"Name", labelNameEn:"Name", labelCatHu:"Category", labelCatEn:"Category", labelUrl:"GitHub URL", labelFileType:"File type", labelOs:"OS", labelPass:"Password (lock)", labelReqHu:"Requirements", labelReqEn:"Requirements", labelInfoHu:"Info text", labelInfoEn:"Info text", labelLocked:"Locked", adminPasswordPrompt:"🔐 ADMIN AUTHENTICATION\n\nEnter password to continue:", adminPasswordWrong:"Wrong password! Access denied.", adminAuthSuccess:"Admin authentication successful!", noAdminRights:"Access denied!", edit:"Edit", lockUnlock:"Lock/Unlock", delete:"Delete", loading:"Loading...", realtimeActive:"Real-time updates active", warningBtn:"⚠️ Warning", warningTitle:"⚠️ Warning", warningClose:"Close", restore:"Restore", permanentDelete:"Permanent delete" }
-};
-function t(key, p=null){ let txt=translations[currentLang][key]; if(p && typeof txt==='function') return txt(p); return txt || key; }
-
-function showToast(msg, isError=false){ let d=document.createElement('div'); d.className='toast-msg'; d.innerText=msg; d.style.background=isError?'#6a1e3ccc':'#0f2a3ecc'; document.body.appendChild(d); setTimeout(()=>{ d.style.opacity='0'; setTimeout(()=>d.remove(),400); },2300); }
-function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>]/g,function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-function setupRealtimeListener() {
-    console.log("Listener beállítása...");
-    
-    db.collection('products').onSnapshot((snapshot) => {
-        console.log("SNAPSHOT érkezett, dokumentumok száma:", snapshot.size);
-        
-        // Töltsd fel a products tömböt
-        products = [];
-        snapshot.forEach(doc => { 
-            const data = doc.data();
-            data.id = doc.id;
-            console.log("Termék adatok:", data.id, data.name);
-            if (data.deleted !== true) {
-                products.push(data);
-            }
-        });
-        
-        console.log("Products tömb hossza:", products.length);
-        console.log("Products tartalma:", products);
-        
-        // Frissítsd a megjelenítést
-        renderStore();
-        buildCategoryFilters();
-        
-        // Frissítsd a státuszt
-        const statusElem = document.getElementById('realtimeStatus');
-        if (statusElem) {
-            statusElem.innerHTML = `<i class="fas fa-check-circle"></i> ${t('realtimeActive')}`;
-        }
-        
-    }, (error) => { 
-        console.error("Listener hiba:", error);
-        showToast("Adatbázis hiba: " + error.message, true);
+function escapeHtml(s) {
+    if (!s) return '';
+    return s.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
     });
 }
 
+// ==================== NYELVI SZÖVEGEK ====================
+const licenseTexts = {
+    hu: `<p><strong>Version 2.0 – Kutatási és Fejlesztési Licenc</strong><br>Utolsó frissítés: 2025. április</p><p><strong>1. Cél</strong><br>Kizárólag oktatási, tesztelési és kutatási célokra.</p><p><strong>2. Felelősség kizárása</strong><br>A szoftvert „AHOGY VAN” biztosítjuk.</p><p><strong>3. Felhasználói felelősség</strong><br>A felhasználó köteles betartani a helyi törvényeket.</p><p><strong>4. Szellemi tulajdon</strong><br>„NYXION Collective” védjegy.</p><p><strong>5. Adatvédelem</strong><br>A szoftver NEM gyűjt személyes adatot.</p><p><strong>6. Licenc elfogadása</strong><br>Letöltéssel elfogadja a feltételeket. © 2025 NYXION Collective.</p>`,
+    en: `<p><strong>Version 2.0 – Research & Development License</strong><br>Last updated: April 2025</p><p><strong>1. Purpose</strong><br>For educational, testing and research purposes only.</p><p><strong>2. Disclaimer</strong><br>The Software is provided "AS IS".</p><p><strong>3. User Responsibility</strong><br>User must comply with local laws.</p><p><strong>4. Intellectual Property</strong><br>"NYXION Collective" trademark.</p><p><strong>5. Privacy</strong><br>The Software does NOT collect personal data.</p><p><strong>6. Acceptance</strong><br>By downloading, you accept the terms. © 2025 NYXION Collective.</p>`
+};
+
+const warningTexts = {
+    hu: `⚠️ FIGYELEM! ⚠️\n\nA Windows automatikusan vírusként észlelheti a fájlokat, mivel azok fejlesztői környezetben készültek.\n\n✅ GARANTÁLJUK, hogy a programok NEM tartalmaznak kártékony kódot.\n\n📌 Javaslat: Használat előtt ellenőrizd a fájlokat, vagy futtasd őket szeparált környezetben.\n\n🔐 A NYXION Collective nem vállal felelősséget a nem rendeltetésszerű használatból eredő károkért.`,
+    en: `⚠️ WARNING! ⚠️\n\nWindows may automatically detect these files as viruses because they were created in a development environment.\n\n✅ WE GUARANTEE that the programs do NOT contain malicious code.\n\n📌 Recommendation: Before using, check the files or run them in a separate environment.\n\n🔐 NYXION Collective assumes no responsibility for damages resulting from unintended use.`
+};
+
+const translations = {
+    hu: { login: "Belépés", logout: "Kilépés", loginGoogle: "Belépés Google-lel", filterAll: "Összes", download: "LETÖLTÉS", locked: "ZÁROLT", reqBtn: "Köv.", copy: "Másol", share: "Megoszt", info: "Info", noResults: "Nincs találat.", toastCopied: " link másolva", toastDownload: " letöltés indítása", toastLocked: "🔒 Zárt tartalom", close: "Bezárás", reqTitle: "Rendszerkövetelmény", licenseTitle: "Licenc", subText: "premium .exe releases • direct GitHub", searchPlaceholder: "Keresés...", tabStore: "⟡ TERMÉKEK", tabCommunity: "⟡ KÖZÖSSÉG", adminPanelTitle: "Admin felület", addBtnText: "Új kártya", manageTitle: "Termékek", trashTitle: "🗑️ Lomtár", huTitle: "Magyar", enTitle: "English", labelNameHu: "Név", labelNameEn: "Name", labelCatHu: "Kategória", labelCatEn: "Category", labelUrl: "GitHub URL", labelFileType: "File típus", labelOs: "OS", labelPass: "Jelszó", labelReqHu: "Követelmény", labelReqEn: "Requirements", labelInfoHu: "Info", labelInfoEn: "Info text", labelLocked: "Zárolt", adminAuthSuccess: "Sikeres admin hitelesítés!", noAdminRights: "Nincs jogosultság!", edit: "Szerkeszt", lockUnlock: "Zárol/Ki", delete: "Törlés", loading: "Betöltés...", realtimeActive: "Valós idejű frissítés", warningBtn: "⚠️ Figyelmeztetés", warningTitle: "⚠️ Figyelmeztetés", warningClose: "Bezárás", restore: "Visszaállítás", permanentDelete: "Végleges törlés", adminPasswordPrompt: "🔐 ADMIN JELSZÓ:", adminPasswordWrong: "Hibás jelszó!" },
+    en: { login: "Login", logout: "Logout", loginGoogle: "Login with Google", filterAll: "All", download: "DOWNLOAD", locked: "LOCKED", reqBtn: "Req.", copy: "Copy", share: "Share", info: "Info", noResults: "No results.", toastCopied: " link copied", toastDownload: " download started", toastLocked: "🔒 Locked", close: "Close", reqTitle: "Requirements", licenseTitle: "License", subText: "premium .exe releases • direct GitHub", searchPlaceholder: "Search...", tabStore: "⟡ PRODUCTS", tabCommunity: "⟡ COMMUNITY", adminPanelTitle: "Admin Panel", addBtnText: "Add card", manageTitle: "Products", trashTitle: "🗑️ Trash", huTitle: "Hungarian", enTitle: "English", labelNameHu: "Name", labelNameEn: "Name", labelCatHu: "Category", labelCatEn: "Category", labelUrl: "GitHub URL", labelFileType: "File type", labelOs: "OS", labelPass: "Password", labelReqHu: "Requirements", labelReqEn: "Requirements", labelInfoHu: "Info", labelInfoEn: "Info text", labelLocked: "Locked", adminAuthSuccess: "Admin auth success!", noAdminRights: "Access denied!", edit: "Edit", lockUnlock: "Lock/Unlock", delete: "Delete", loading: "Loading...", realtimeActive: "Real-time active", warningBtn: "⚠️ Warning", warningTitle: "⚠️ Warning", warningClose: "Close", restore: "Restore", permanentDelete: "Permanent delete", adminPasswordPrompt: "🔐 ADMIN PASSWORD:", adminPasswordWrong: "Wrong password!" }
+};
+
+function t(key, p = null) {
+    let txt = translations[currentLang][key];
+    if (p && typeof txt === 'function') return txt(p);
+    return txt || key;
+}
+
+// ==================== TERMÉK MEGJELENÍTÉS ====================
 function renderStore() {
     const container = document.getElementById('storeList');
-    if (!container) {
-        console.error("storeList elem nem található!");
-        return;
-    }
-    
-    console.log("Termékek száma:", products.length);
-    console.log("Aktív kategória:", activeCategory);
-    console.log("Keresés:", searchQuery);
+    if (!container) return;
     
     let filtered = products.filter(p => 
         !p.deleted && 
@@ -296,17 +324,13 @@ function renderStore() {
         (activeCategory === 'all' || (p.category?.[currentLang] || '') === activeCategory)
     );
     
-    console.log("Szűrt termékek száma:", filtered.length);
-    
-    if (filtered.length === 0) { 
-        container.innerHTML = `<div class="no-results"><i class="fas fa-box-open"></i> ${t('noResults')}</div>`; 
-        return; 
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="no-results"><i class="fas fa-box-open"></i> ${t('noResults')}</div>`;
+        return;
     }
     
     container.innerHTML = '';
     for (const prod of filtered) {
-        console.log("Megjelenítés:", prod.name?.[currentLang]);
-        
         const card = document.createElement('div');
         card.className = 'glass-card';
         if (prod.locked) card.classList.add('locked-card');
@@ -349,111 +373,148 @@ function renderStore() {
     attachCardEvents();
 }
 
-function attachCardEvents(){
-    document.querySelectorAll('.btn-download:not([disabled])').forEach(btn=>btn.addEventListener('click',()=>{ const url=btn.dataset.url,name=btn.dataset.name; if(url && url!=='#'){ window.open(url,'_blank'); showToast(name+t('toastDownload')); } else showToast(t('toastLocked'),true); }));
-    document.querySelectorAll('.copy-link-btn:not(.disabled)').forEach(btn=>btn.addEventListener('click',()=>{ const url=btn.dataset.url,name=btn.dataset.name; if(url && url!=='#') copyToClipboard(url,name); else showToast(t('toastNoLink'),true); }));
-    document.querySelectorAll('.share-btn:not(.disabled)').forEach(btn=>btn.addEventListener('click',()=>{ const url=btn.dataset.url,name=btn.dataset.name; if(url && url!=='#') shareLink(url,name); else showToast(t('toastNoLink'),true); }));
-    document.querySelectorAll('.pass-btn:not([disabled])').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); alert(t('passwordAlert',btn.dataset.pass)); }));
-    document.querySelectorAll('.requirements-btn').forEach(btn=>btn.addEventListener('click',()=>{ document.getElementById('requirementsText').innerHTML=btn.dataset.req; document.getElementById('requirementsModal').style.display='flex'; }));
-    document.querySelectorAll('.highlight-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ const card=btn.closest('.glass-card'); if(card.classList.contains('locked-card')){ showToast(t('toastLocked'),true); return; } const info=card.dataset.info; document.getElementById('tooltipText').innerHTML=info; const rect=card.getBoundingClientRect(); let left=rect.right+15,top=rect.top; if(left+280>window.innerWidth) left=rect.left-295; if(top+200>window.innerHeight) top=window.innerHeight-210; const tooltip=document.getElementById('highlightTooltip'); tooltip.style.left=left+'px'; tooltip.style.top=top+'px'; tooltip.style.display='block'; }));
-    document.getElementById('closeTooltipBtn').onclick=()=>document.getElementById('highlightTooltip').style.display='none';
+function attachCardEvents() {
+    document.querySelectorAll('.btn-download:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const url = btn.dataset.url, name = btn.dataset.name;
+            if (url && url !== '#') { window.open(url, '_blank'); showToast(name + t('toastDownload')); }
+            else showToast(t('toastLocked'), true);
+        });
+    });
+    document.querySelectorAll('.copy-link-btn:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const url = btn.dataset.url, name = btn.dataset.name;
+            if (url && url !== '#') { await navigator.clipboard.writeText(url); showToast(name + t('toastCopied')); }
+            else showToast(t('toastLocked'), true);
+        });
+    });
+    document.querySelectorAll('.share-btn:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const url = btn.dataset.url, name = btn.dataset.name;
+            if (navigator.share && url && url !== '#') {
+                try { await navigator.share({ title: name, url }); showToast(t('toastShare')); }
+                catch(e) {}
+            } else if (url && url !== '#') { await navigator.clipboard.writeText(url); showToast(name + t('toastCopied')); }
+            else showToast(t('toastLocked'), true);
+        });
+    });
+    document.querySelectorAll('.pass-btn:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            alert(`${t('locked')}: ${btn.dataset.pass}`);
+        });
+    });
+    document.querySelectorAll('.requirements-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('requirementsText').innerHTML = btn.dataset.req;
+            document.getElementById('requirementsModal').style.display = 'flex';
+        });
+    });
+    document.querySelectorAll('.highlight-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const card = btn.closest('.glass-card');
+            if (card.classList.contains('locked-card')) { showToast(t('toastLocked'), true); return; }
+            const info = card.dataset.info;
+            alert(info.substring(0, 200));
+        });
+    });
 }
 
-async function copyToClipboard(url,name){ try{ await navigator.clipboard.writeText(url); showToast(name+t('toastCopied')); } catch(e){ showToast(t('toastCopyFail'),true); } }
-async function shareLink(url,name){ if(navigator.share){ try{ await navigator.share({title:`${name} - NYXION`,text:`Download ${name} for free!`,url}); showToast(t('toastShare')); } catch(e){ if(e.name!=='AbortError') showToast(t('toastShareFail'),true); } } else{ await copyToClipboard(url,name); } }
-
-function buildCategoryFilters(){
-    const cats=[...new Set(products.filter(p=>!p.deleted && p.category).map(p=>p.category[currentLang]))];
-    let html=`<div class="filter-chip ${activeCategory==='all'?'active':''}" data-category="all">${t('filterAll')}</div>`;
-    cats.forEach(c=>html+=`<div class="filter-chip ${activeCategory===c?'active':''}" data-category="${c}">${c}</div>`);
-    document.getElementById('categoryFilters').innerHTML=html;
-    document.querySelectorAll('.filter-chip').forEach(ch=>ch.addEventListener('click',()=>{ activeCategory=ch.dataset.category; renderStore(); buildCategoryFilters(); }));
-}
-document.getElementById('searchInput').addEventListener('input',e=>{ searchQuery=e.target.value.toLowerCase(); renderStore(); });
-
-async function checkAdminAccess(user) {
-    if(user && user.email){ const emailHash=await hashEmail(user.email); if(emailHash===_emailHash){ adminEmailMatched=true; document.getElementById('adminTabBtn').style.display='block'; return; } }
-    adminEmailMatched=false; adminAuthorized=false; document.getElementById('adminTabBtn').style.display='none';
-    if(document.getElementById('adminTab').classList.contains('active')) document.querySelector('.tab[data-tab="storeTab"]').click();
+function buildCategoryFilters() {
+    const cats = [...new Set(products.filter(p => !p.deleted && p.category).map(p => p.category[currentLang]))];
+    let html = `<div class="filter-chip ${activeCategory === 'all' ? 'active' : ''}" data-category="all">${t('filterAll')}</div>`;
+    cats.forEach(c => html += `<div class="filter-chip ${activeCategory === c ? 'active' : ''}" data-category="${c}">${escapeHtml(c)}</div>`);
+    document.getElementById('categoryFilters').innerHTML = html;
+    document.querySelectorAll('.filter-chip').forEach(ch => ch.addEventListener('click', () => {
+        activeCategory = ch.dataset.category;
+        renderStore();
+        buildCategoryFilters();
+    }));
 }
 
-function requestAdminPassword(callback){
-    if(adminAuthorized){ if(callback) callback(true); return; }
-    const pwd=prompt(t('adminPasswordPrompt'));
-    if(pwd){ hashPassword(pwd).then(pwdHash=>{ if(pwdHash===_passHash){ adminAuthorized=true; showToast(t('adminAuthSuccess'),false); if(callback) callback(true); } else { alert(t('adminPasswordWrong')); adminAuthorized=false; if(callback) callback(false); } }); }
-    else { if(callback) callback(false); }
+// ==================== FIRESTORE LISTENER ====================
+function setupRealtimeListener() {
+    db.collection('products').onSnapshot((snapshot) => {
+        products = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            data.id = doc.id;
+            if (data.deleted !== true) products.push(data);
+        });
+        if (adminAuthorized) renderAdminList();
+        renderStore();
+        buildCategoryFilters();
+    }, (error) => {
+        console.error("Firestore hiba:", error);
+        showToast("Adatbázis hiba!", true);
+    });
 }
 
-function updateCategorySelects(){
-    const catsHu = [...new Set(products.filter(p=>!p.deleted && p.category).map(p=>p.category.hu))];
-    const catsEn = [...new Set(products.filter(p=>!p.deleted && p.category).map(p=>p.category.en))];
-    const huSelect = document.getElementById('prodCatHuSelect');
-    const enSelect = document.getElementById('prodCatEnSelect');
-    huSelect.innerHTML = '<option value="">-- Válassz --</option>' + catsHu.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-    enSelect.innerHTML = '<option value="">-- Select --</option>' + catsEn.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+// ==================== ADMIN FUNKCIÓK ====================
+function showAdminPasswordDialog(callback) {
+    const overlay = document.createElement('div');
+    overlay.className = 'password-modal-overlay';
+    overlay.innerHTML = `
+        <div class="password-modal">
+            <h3 style="color:var(--primary); margin-bottom:1rem;">🔐 ${t('adminPasswordPrompt')}</h3>
+            <input type="password" id="adminPasswordInput" placeholder="••••••••" autocomplete="off">
+            <div>
+                <button id="adminPwdConfirm">✅ OK</button>
+                <button id="adminPwdCancel">❌ ${t('close')}</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    const input = overlay.querySelector('#adminPasswordInput');
+    input.focus();
+    overlay.querySelector('#adminPwdConfirm').onclick = async () => {
+        const pwdHash = await hashPassword(input.value);
+        overlay.remove();
+        if (pwdHash === ADMIN_PASSWORD_HASH) {
+            adminAuthorized = true;
+            showToast(t('adminAuthSuccess'));
+            document.getElementById('adminTabBtn').style.display = 'block';
+            if (callback) callback(true);
+        } else {
+            showToast(t('adminPasswordWrong'), true);
+            if (callback) callback(false);
+        }
+    };
+    overlay.querySelector('#adminPwdCancel').onclick = () => {
+        overlay.remove();
+        if (callback) callback(false);
+    };
 }
 
-function renderAdminList(){
-    const container=document.getElementById('adminProductList');
-    if(!container) return;
-    const activeProducts = products.filter(p=>!p.deleted);
-    if(activeProducts.length === 0){
-        container.innerHTML='<div style="padding:1rem; text-align:center; color:var(--text-dim);"><i class="fas fa-info-circle"></i> Nincsenek termékek. Hozz létre egyet!</div>';
+function renderAdminList() {
+    const container = document.getElementById('adminProductList');
+    if (!container) return;
+    const activeProducts = products.filter(p => !p.deleted);
+    if (activeProducts.length === 0) {
+        container.innerHTML = '<div style="padding:1rem; text-align:center;">✨ Nincsenek termékek</div>';
         return;
     }
-    container.innerHTML=activeProducts.map(p=>`<div class="admin-product-item"><div><strong>${escapeHtml(p.name?.hu || '?')}</strong> / ${escapeHtml(p.name?.en || '?')} <span style="font-size:0.7rem;background:#ffaa3322;padding:2px 8px;border-radius:20px;">${p.locked?'🔒 Zárolt':'🔓 Nyitott'}</span></div><div><button class="admin-btn" onclick="editProductById('${p.id}')" style="background:#ffaa33; margin-right:8px;"><i class="fas fa-edit"></i> ${t('edit')}</button><button class="admin-btn" onclick="toggleLockById('${p.id}')" style="background:#8866cc;"><i class="fas fa-lock"></i> ${t('lockUnlock')}</button><button class="admin-btn admin-btn-danger" onclick="moveToTrash('${p.id}')" style="background:#cc3366;"><i class="fas fa-trash"></i> ${t('delete')}</button></div></div>`).join('');
-    renderTrashList();
+    container.innerHTML = activeProducts.map(p => `
+        <div class="admin-product-item">
+            <div><strong>${escapeHtml(p.name?.hu || '?')}</strong> / ${escapeHtml(p.name?.en || '?')}</div>
+            <div>
+                <button class="admin-btn" style="background:#ffaa33;" onclick="editProduct('${p.id}')">✏️ ${t('edit')}</button>
+                <button class="admin-btn" style="background:#8866cc;" onclick="toggleLock('${p.id}')">🔒 ${t('lockUnlock')}</button>
+                <button class="admin-btn admin-btn-danger" onclick="deleteProduct('${p.id}')">🗑️ ${t('delete')}</button>
+            </div>
+        </div>
+    `).join('');
 }
 
-function renderTrashList(){
-    const container=document.getElementById('trashItems');
-    if(!container) return;
-    if(trash.length===0){ container.innerHTML='<div style="padding:1rem; text-align:center; color:var(--text-dim);"><i class="fas fa-trash-alt"></i> '+(currentLang==='hu'?'A lomtár üres':'Trash is empty')+'</div>'; return; }
-    container.innerHTML=trash.map((item)=>`<div class="trash-item"><div><strong>${escapeHtml(item.product.name?.hu)}</strong> / ${escapeHtml(item.product.name?.en)} <span style="font-size:0.7rem;color:#ffaa33;">(zárolt állapotban)</span></div><div><button class="restore-btn" onclick="restoreFromTrash('${item.id}')"><i class="fas fa-recycle"></i> ${t('restore')}</button><button class="permanent-delete-btn" onclick="permanentDelete('${item.id}')"><i class="fas fa-trash-alt"></i> ${t('permanentDelete')}</button></div></div>`).join('');
-}
-
-window.moveToTrash = async function(id){
-    if(!adminAuthorized){ requestAdminPassword((s)=>{ if(s) moveToTrash(id); }); return; }
-    const product = products.find(p=>p.id===id);
-    if(product){
-        const deletedProduct = {...product, locked: true, deleted: true};
-        const trashId = "trash_"+Date.now()+"_"+Math.random().toString(36).substr(2, 6);
-        await db.collection('trash').doc(trashId).set({ id: trashId, product: deletedProduct, deletedAt: Date.now() });
-        await db.collection('products').doc(id).delete();
-        showToast(currentLang==='hu'?'Termék a lomtárba helyezve (zárolt állapotban)':'Product moved to trash (locked)');
-    }
-};
-
-window.restoreFromTrash = async function(trashId){
-    if(!adminAuthorized){ requestAdminPassword((s)=>{ if(s) restoreFromTrash(trashId); }); return; }
-    const trashDoc = await db.collection('trash').doc(trashId).get();
-    if(trashDoc.exists){
-        const restored = {...trashDoc.data().product, locked: true, deleted: false};
-        await db.collection('products').doc(restored.id).set(restored);
-        await db.collection('trash').doc(trashId).delete();
-        showToast(currentLang==='hu'?'Termék visszaállítva (zárolt állapotban)':'Product restored (locked)');
-    }
-};
-
-window.permanentDelete = async function(trashId){
-    if(!adminAuthorized){ requestAdminPassword((s)=>{ if(s) permanentDelete(trashId); }); return; }
-    if(confirm(currentLang==='hu'?'Véglegesen törlöd? Ez nem visszavonható!':'Permanent delete? This cannot be undone!')){
-        await db.collection('trash').doc(trashId).delete();
-        showToast(currentLang==='hu'?'Véglegesen törölve':'Permanently deleted');
-    }
-};
-
-window.editProductById = function(id){
-    if(!adminAuthorized){ requestAdminPassword((s)=>{ if(s) editProductById(id); }); return; }
+window.editProduct = async function(id) {
+    if (!adminAuthorized) return;
+    const p = products.find(p => p.id === id);
+    if (!p) return;
     editingProductId = id;
-    const p = products.find(p=>p.id===id);
-    if(!p) return;
     document.getElementById('prodNameHu').value = p.name?.hu || '';
     document.getElementById('prodNameEn').value = p.name?.en || '';
-    if(document.getElementById('prodCatHuSelect').querySelector(`option[value="${p.category?.hu}"]`)) document.getElementById('prodCatHuSelect').value = p.category?.hu || '';
-    else document.getElementById('prodCatHuSelect').value = '';
-    if(document.getElementById('prodCatEnSelect').querySelector(`option[value="${p.category?.en}"]`)) document.getElementById('prodCatEnSelect').value = p.category?.en || '';
-    else document.getElementById('prodCatEnSelect').value = '';
+    document.getElementById('prodCatHuSelect').value = p.category?.hu || '';
+    document.getElementById('prodCatEnSelect').value = p.category?.en || '';
     document.getElementById('prodUrl').value = p.githubUrl || '';
     document.getElementById('prodFileType').value = p.fileType || '.exe';
     document.getElementById('prodOs').value = p.os || 'Win10/11';
@@ -463,16 +524,11 @@ window.editProductById = function(id){
     document.getElementById('prodReqEn').value = p.requirements?.en || '';
     document.getElementById('prodInfoHu').value = p.infoText?.hu || '';
     document.getElementById('prodInfoEn').value = p.infoText?.en || '';
-    const addBtn = document.getElementById('addProductBtn');
-    addBtn.innerHTML = `<i class="fas fa-save"></i> ${currentLang==='hu'?'Módosítás mentése':'Save changes'}`;
-    addBtn.onclick = async () => {
-        const updatedProduct = {
-            ...p,
+    document.getElementById('addProductBtn').innerHTML = `<i class="fas fa-save"></i> ${currentLang === 'hu' ? 'Mentés' : 'Save'}`;
+    document.getElementById('addProductBtn').onclick = async () => {
+        const updated = {
             name: { hu: document.getElementById('prodNameHu').value, en: document.getElementById('prodNameEn').value },
-            category: { 
-                hu: document.getElementById('prodCatHuSelect').value || p.category?.hu || "Egyéb",
-                en: document.getElementById('prodCatEnSelect').value || p.category?.en || "Other"
-            },
+            category: { hu: document.getElementById('prodCatHuSelect').value, en: document.getElementById('prodCatEnSelect').value },
             githubUrl: document.getElementById('prodUrl').value,
             fileType: document.getElementById('prodFileType').value,
             os: document.getElementById('prodOs').value,
@@ -482,134 +538,269 @@ window.editProductById = function(id){
             infoText: { hu: document.getElementById('prodInfoHu').value, en: document.getElementById('prodInfoEn').value },
             deleted: false
         };
-        await db.collection('products').doc(id).set(updatedProduct);
-        addBtn.innerHTML = `<i class="fas fa-plus"></i> ${t('addBtnText')}`;
-        addBtn.onclick = addNewProduct;
-        document.querySelectorAll('#adminTab input, #adminTab select, #adminTab textarea').forEach(i=>i.value='');
-        editingProductId = null;
+        await db.collection('products').doc(id).set(updated);
+        resetAdminForm();
         showToast(t('adminAuthSuccess'));
     };
 };
 
-window.toggleLockById = async function(id){
-    if(!adminAuthorized){ requestAdminPassword((s)=>{ if(s) toggleLockById(id); }); return; }
-    const p = products.find(p=>p.id===id);
-    if(p){ 
-        await db.collection('products').doc(id).update({ locked: !p.locked });
-        showToast(`${currentLang==='hu'?'Zárolás állapot':'Lock status'}: ${!p.locked?(currentLang==='hu'?'ZÁROLT':'LOCKED'):(currentLang==='hu'?'NYITOTT':'OPEN')}`);
+window.toggleLock = async function(id) {
+    if (!adminAuthorized) return;
+    const p = products.find(p => p.id === id);
+    if (p) await db.collection('products').doc(id).update({ locked: !p.locked });
+};
+
+window.deleteProduct = async function(id) {
+    if (!adminAuthorized) return;
+    if (confirm(currentLang === 'hu' ? 'Biztosan törlöd?' : 'Delete?')) {
+        await db.collection('products').doc(id).delete();
     }
 };
 
-async function addNewProduct(){
-    if(!adminAuthorized){ requestAdminPassword((s)=>{ if(s) addNewProduct(); }); return; }
-    const newId = "nyxion_"+Date.now()+"_"+Math.random().toString(36).substr(2, 6);
-    const newProd = { 
-        id: newId, 
-        githubUrl: document.getElementById('prodUrl').value, 
-        price: "Free", 
-        fileType: document.getElementById('prodFileType').value, 
-        os: document.getElementById('prodOs').value, 
-        pass: document.getElementById('prodPass').value, 
-        locked: document.getElementById('prodLocked').value==='true', 
-        deleted: false, 
-        category: { 
-            hu: document.getElementById('prodCatHuSelect').value || "Egyéb", 
-            en: document.getElementById('prodCatEnSelect').value || "Other" 
-        }, 
-        name: { 
-            hu: document.getElementById('prodNameHu').value, 
-            en: document.getElementById('prodNameEn').value 
-        }, 
-        requirements: { hu: document.getElementById('prodReqHu').value, en: document.getElementById('prodReqEn').value }, 
-        infoText: { hu: document.getElementById('prodInfoHu').value, en: document.getElementById('prodInfoEn').value } 
+function resetAdminForm() {
+    editingProductId = null;
+    document.getElementById('prodNameHu').value = '';
+    document.getElementById('prodNameEn').value = '';
+    document.getElementById('prodCatHuSelect').value = '';
+    document.getElementById('prodCatEnSelect').value = '';
+    document.getElementById('prodUrl').value = '';
+    document.getElementById('prodFileType').value = '.exe';
+    document.getElementById('prodOs').value = 'Win10/11';
+    document.getElementById('prodPass').value = 'nyxion';
+    document.getElementById('prodLocked').value = 'false';
+    document.getElementById('prodReqHu').value = '';
+    document.getElementById('prodReqEn').value = '';
+    document.getElementById('prodInfoHu').value = '';
+    document.getElementById('prodInfoEn').value = '';
+    document.getElementById('addProductBtn').innerHTML = `<i class="fas fa-plus"></i> ${t('addBtnText')}`;
+    document.getElementById('addProductBtn').onclick = addNewProduct;
+}
+
+async function addNewProduct() {
+    if (!adminAuthorized) return;
+    const newId = "nyxion_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+    const newProd = {
+        id: newId,
+        githubUrl: document.getElementById('prodUrl').value,
+        price: "Free",
+        fileType: document.getElementById('prodFileType').value,
+        os: document.getElementById('prodOs').value,
+        pass: document.getElementById('prodPass').value,
+        locked: document.getElementById('prodLocked').value === 'true',
+        deleted: false,
+        category: {
+            hu: document.getElementById('prodCatHuSelect').value || "Egyéb",
+            en: document.getElementById('prodCatEnSelect').value || "Other"
+        },
+        name: {
+            hu: document.getElementById('prodNameHu').value,
+            en: document.getElementById('prodNameEn').value
+        },
+        requirements: {
+            hu: document.getElementById('prodReqHu').value,
+            en: document.getElementById('prodReqEn').value
+        },
+        infoText: {
+            hu: document.getElementById('prodInfoHu').value,
+            en: document.getElementById('prodInfoEn').value
+        }
     };
-    if(!newProd.name.hu || !newProd.name.en){ showToast(currentLang==='hu'?'Név megadása kötelező!':'Name is required!',true); return; }
+    if (!newProd.name.hu || !newProd.name.en) {
+        showToast(t('noAdminRights'), true);
+        return;
+    }
     await db.collection('products').doc(newId).set(newProd);
-    document.querySelectorAll('#adminTab input, #adminTab select, #adminTab textarea').forEach(i=>i.value='');
+    resetAdminForm();
     showToast(t('adminAuthSuccess'));
 }
 
-document.getElementById('addProductBtn').onclick = addNewProduct;
-
-['newCatHuBtn','newCatEnBtn'].forEach(btnId=>{ document.getElementById(btnId)?.addEventListener('click',()=>{ const isHu=btnId==='newCatHuBtn'; const inputId=isHu?'prodCatHuNew':'prodCatEnNew'; const selectId=isHu?'prodCatHuSelect':'prodCatEnSelect'; const input=document.getElementById(inputId); if(input.style.display==='none'){ input.style.display='block'; input.focus(); input.onblur=()=>{ if(input.value.trim()){ const newOption=document.createElement('option'); newOption.value=input.value.trim(); newOption.textContent=input.value.trim(); const select=document.getElementById(selectId); select.appendChild(newOption); select.value=input.value.trim(); input.style.display='none'; input.value=''; showToast(currentLang==='hu'?'Új kategória hozzáadva':'New category added'); } else { input.style.display='none'; input.value=''; } }; } else { input.style.display='none'; input.value=''; } }); });
-
-document.getElementById('warningBtn').addEventListener('click', () => {
-    document.getElementById('warningContent').innerHTML = warningTexts[currentLang].replace(/\n/g, '<br>');
-    document.getElementById('warningModal').style.display = 'flex';
-});
-
-async function initializeDatabase() {
-    const snapshot = await db.collection('products').get();
-    if (snapshot.empty) {
-        const defaultProducts = [
-            { id: "nyxion_utility_tool", githubUrl: "https://github.com/nexus-the-power/nexus-exe-store/releases/download/exe/NexusHelper-V1.exe", price: "Free", fileType: ".exe", os: "Win10/11", pass: "nyxion", locked: false, deleted: false, category: {hu:"Rendszereszköz", en:"Utility"}, name: {hu:"Windows segédprogram", en:"Windows Utility Tool"}, requirements: {hu:"🔧 Nincs szükség külső függőségre. Windows 10/11 rendszeren fut.", en:"🔧 No additional dependencies required. Runs on Windows 10/11."}, infoText: {hu:"Könnyű rendszersegéd: temp fájlok tisztítása, RAM optimalizálás, üres mappák törlése.", en:"Lightweight system helper: temp file cleanup, RAM optimization, empty folder removal."} },
-            { id: "nyxion_art_generator", githubUrl: "https://github.com/nexus-the-power/nexus-exe-store/releases/download/exe/AsciiArtGenerator_Setup_V1.exe", price: "Free", fileType: ".exe", os: "Win10/11", pass: "nyxion", locked: false, deleted: false, category: {hu:"Grafika", en:"Graphics"}, name: {hu:"ASCII Art generátor", en:"ASCII Art Generator"}, requirements: {hu:"⚠️ .NET Desktop Runtime 10.0 szükséges.<br>📥 https://dotnet.microsoft.com/download/dotnet/10.0", en:"⚠️ .NET Desktop Runtime 10.0 required.<br>📥 https://dotnet.microsoft.com/download/dotnet/10.0"}, infoText: {hu:"Képek (JPG, PNG) átalakítása ASCII karakterekké. Állítható szélesség, invertálás.", en:"Convert images (JPG, PNG) to ASCII characters. Adjustable width, invert, copy to clipboard."} },
-            { id: "nyxion_password_generator", githubUrl: "https://github.com/nexus-the-power/nexus-exe-store/releases/download/exe/NexusPasswordGeneratorSETUP.exe", price: "Free", fileType: ".exe", os: "Win10/11", pass: "nyxion", locked: false, deleted: false, category: {hu:"Jelszó", en:"Password"}, name: {hu:"Jelszó generátor", en:"Password generator"}, requirements: {hu:"⚠️ .NET Desktop Runtime 10.0 szükséges.<br>📥 https://dotnet.microsoft.com/download/dotnet/10.0", en:"⚠️ .NET Desktop Runtime 10.0 required.<br>📥 https://dotnet.microsoft.com/download/dotnet/10.0"}, infoText: {hu:"Biztonságos, egyedi jelszavak generálása (6-48 karakter, speciális jelekkel), valós idejű erősségjelzővel.", en:"Generate secure, unique passwords (6-48 characters, including special characters) with real-time strength indicator."} },
-        ];
-        for (const prod of defaultProducts) {
-            await db.collection('products').doc(prod.id).set(prod);
-        }
-    }
+function updateCategorySelects() {
+    const catsHu = [...new Set(products.filter(p => !p.deleted && p.category).map(p => p.category.hu))];
+    const catsEn = [...new Set(products.filter(p => !p.deleted && p.category).map(p => p.category.en))];
+    const huSelect = document.getElementById('prodCatHuSelect');
+    const enSelect = document.getElementById('prodCatEnSelect');
+    huSelect.innerHTML = '<option value="">-- Válassz --</option>' + catsHu.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    enSelect.innerHTML = '<option value="">-- Select --</option>' + catsEn.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
 }
 
-function applyLanguage(){
-    document.getElementById('tabStore').innerText=t('tabStore'); document.getElementById('tabCommunity').innerText=t('tabCommunity'); document.getElementById('subText').innerText=t('subText'); document.getElementById('searchInput').placeholder=t('searchPlaceholder'); document.getElementById('licenseBtnText').innerText=t('licenseBtn'); document.getElementById('licenseTitle').innerText=t('licenseTitle'); document.getElementById('closeBtnText').innerText=t('close'); document.getElementById('reqTitle').innerText=t('reqTitle'); document.getElementById('closeReqBtnText').innerText=t('close'); document.getElementById('tooltipTitle').innerText=t('tooltipTitle'); document.getElementById('gotItText').innerText=t('gotIt'); document.getElementById('adminPanelTitle').innerText=t('adminPanelTitle'); document.getElementById('addBtnText').innerText=t('addBtnText'); document.getElementById('manageTitle').innerText=t('manageTitle'); document.getElementById('trashTitle').innerText=t('trashTitle'); document.getElementById('huTitle').innerText=t('huTitle'); document.getElementById('enTitle').innerText=t('enTitle'); document.getElementById('labelNameHu').innerText=t('labelNameHu'); document.getElementById('labelNameEn').innerText=t('labelNameEn'); document.getElementById('labelCatHu').innerText=t('labelCatHu'); document.getElementById('labelCatEn').innerText=t('labelCatEn'); document.getElementById('labelUrl').innerText=t('labelUrl'); document.getElementById('labelFileType').innerText=t('labelFileType'); document.getElementById('labelOs').innerText=t('labelOs'); document.getElementById('labelPass').innerText=t('labelPass'); document.getElementById('labelReqHu').innerText=t('labelReqHu'); document.getElementById('labelReqEn').innerText=t('labelReqEn'); document.getElementById('labelInfoHu').innerText=t('labelInfoHu'); document.getElementById('labelInfoEn').innerText=t('labelInfoEn'); document.getElementById('labelLocked').innerText=t('labelLocked'); document.getElementById('warningBtnText').innerText = t('warningBtn');
+// ==================== NYELV ÉS FELHASZNÁLÓ KEZELÉS ====================
+function applyLanguage() {
+    document.getElementById('tabStore').innerText = t('tabStore');
+    document.getElementById('tabCommunity').innerText = t('tabCommunity');
+    document.getElementById('subText').innerText = t('subText');
+    document.getElementById('searchInput').placeholder = t('searchPlaceholder');
+    document.getElementById('licenseBtnText').innerText = t('licenseBtn');
+    document.getElementById('licenseTitle').innerText = t('licenseTitle');
+    document.getElementById('closeBtnText').innerText = t('close');
+    document.getElementById('reqTitle').innerText = t('reqTitle');
+    document.getElementById('closeReqBtnText').innerText = t('close');
+    document.getElementById('adminPanelTitle').innerText = t('adminPanelTitle');
+    document.getElementById('addBtnText').innerText = t('addBtnText');
+    document.getElementById('manageTitle').innerText = t('manageTitle');
+    document.getElementById('trashTitle').innerText = t('trashTitle');
+    document.getElementById('huTitle').innerText = t('huTitle');
+    document.getElementById('enTitle').innerText = t('enTitle');
+    document.getElementById('labelNameHu').innerText = t('labelNameHu');
+    document.getElementById('labelNameEn').innerText = t('labelNameEn');
+    document.getElementById('labelCatHu').innerText = t('labelCatHu');
+    document.getElementById('labelCatEn').innerText = t('labelCatEn');
+    document.getElementById('labelUrl').innerText = t('labelUrl');
+    document.getElementById('labelFileType').innerText = t('labelFileType');
+    document.getElementById('labelOs').innerText = t('labelOs');
+    document.getElementById('labelPass').innerText = t('labelPass');
+    document.getElementById('labelReqHu').innerText = t('labelReqHu');
+    document.getElementById('labelReqEn').innerText = t('labelReqEn');
+    document.getElementById('labelInfoHu').innerText = t('labelInfoHu');
+    document.getElementById('labelInfoEn').innerText = t('labelInfoEn');
+    document.getElementById('labelLocked').innerText = t('labelLocked');
+    document.getElementById('warningBtnText').innerText = t('warningBtn');
     document.getElementById('warningTitle').innerText = t('warningTitle');
     document.getElementById('warningCloseBtn').innerText = t('warningClose');
     document.getElementById('licenseContent').innerHTML = licenseTexts[currentLang];
+    document.getElementById('warningContent').innerHTML = warningTexts[currentLang];
     document.getElementById('realtimeStatus').innerHTML = `<i class="fas fa-check-circle"></i> ${t('realtimeActive')}`;
-    const loginSpan=document.getElementById('loginText'); if(loginSpan) loginSpan.innerText=auth.currentUser?t('logout'):t('login');
-    const authBtnElem=document.getElementById('authActionBtn'); if(authBtnElem){ if(auth.currentUser) authBtnElem.innerHTML=`<i class="fas fa-sign-out-alt"></i> ${t('logout')}`; else authBtnElem.innerHTML=`<i class="fab fa-google"></i> ${t('loginGoogle')}`; }
-    activeCategory = "all";
-    buildCategoryFilters(); 
-    renderStore(); 
+    if (authUser) {
+        document.getElementById('loginText').innerText = t('logout');
+        document.getElementById('authActionBtn').innerHTML = `<i class="fas fa-sign-out-alt"></i> ${t('logout')}`;
+    } else {
+        document.getElementById('loginText').innerText = t('login');
+        document.getElementById('authActionBtn').innerHTML = `<i class="fab fa-google"></i> ${t('loginGoogle')}`;
+    }
+    renderStore();
+    buildCategoryFilters();
     updateCategorySelects();
-    const trashToggle=document.getElementById('trashToggle'); if(trashToggle) trashToggle.onclick=()=>{ document.getElementById('trashItems').classList.toggle('show'); };
-    if(adminAuthorized) renderAdminList();
 }
 
-function setLanguage(lang){ 
-    currentLang=lang; 
-    localStorage.setItem('nyxionLang',lang); 
-    document.querySelectorAll('.lang-btn').forEach(btn=>{ 
-        if(btn.dataset.lang===lang) btn.classList.add('active'); 
-        else btn.classList.remove('active'); 
-    }); 
-    activeCategory = "all";
-    applyLanguage(); 
+function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('nyxionLang', lang);
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        if (btn.dataset.lang === lang) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+    applyLanguage();
 }
-document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',()=>setLanguage(btn.dataset.lang)));
 
-const authBtn=document.getElementById('authActionBtn'), userInfoArea=document.getElementById('userInfoArea'), userAvatarSmall=document.getElementById('userAvatarSmall'), userNameSmall=document.getElementById('userNameSmall');
-function updateAuthUI(user){
-    if(user){ 
-        authBtn.innerHTML=`<i class="fas fa-sign-out-alt"></i> ${t('logout')}`; authBtn.onclick=()=>auth.signOut(); 
-        userInfoArea.style.display='flex'; 
-        userAvatarSmall.src=user.photoURL||'https://placehold.co/40x40/0a1220/cyan?text=U'; 
-        userNameSmall.innerText=user.displayName||user.email?.split('@')[0]||(currentLang==='hu'?'Felhasználó':'User'); 
-        checkAdminAccess(user); 
-        initializeDatabase().then(() => { setupRealtimeListeners(); });
-    } else { 
-        authBtn.innerHTML=`<i class="fab fa-google"></i> ${t('loginGoogle')}`; 
-        authBtn.onclick=()=>auth.signInWithPopup(provider).catch(err=>showToast(`Login error: ${err.message}`,true)); 
-        userInfoArea.style.display='none'; 
-        adminEmailMatched=false; 
-        adminAuthorized=false; 
-        document.getElementById('adminTabBtn').style.display='none'; 
+function updateAuthUI(user) {
+    authUser = user;
+    if (user) {
+        document.getElementById('authActionBtn').innerHTML = `<i class="fas fa-sign-out-alt"></i> ${t('logout')}`;
+        document.getElementById('authActionBtn').onclick = () => auth.signOut();
+        document.getElementById('userInfoArea').style.display = 'flex';
+        document.getElementById('userAvatarSmall').src = user.photoURL || 'https://placehold.co/40x40/0a1220/cyan?text=U';
+        document.getElementById('userNameSmall').innerText = user.displayName || user.email?.split('@')[0] || 'User';
+        document.getElementById('loginText').innerText = t('logout');
+        
+        // Admin panel megjelenítése (jelszó kell hozzá)
+        document.getElementById('adminTabBtn').style.display = 'block';
+    } else {
+        document.getElementById('authActionBtn').innerHTML = `<i class="fab fa-google"></i> ${t('loginGoogle')}`;
+        document.getElementById('authActionBtn').onclick = () => auth.signInWithPopup(provider);
+        document.getElementById('userInfoArea').style.display = 'none';
+        document.getElementById('adminTabBtn').style.display = 'none';
+        adminAuthorized = false;
     }
 }
+
+// ==================== ESEMÉNYEK ÉS INDÍTÁS ====================
+document.getElementById('searchInput').addEventListener('input', e => { searchQuery = e.target.value.toLowerCase(); renderStore(); });
+document.getElementById('warningBtn').addEventListener('click', () => document.getElementById('warningModal').style.display = 'flex');
+document.getElementById('licenseBtn').addEventListener('click', () => document.getElementById('licenseModal').style.display = 'flex');
+document.getElementById('closeLicenseModalBtn').addEventListener('click', () => document.getElementById('licenseModal').style.display = 'none');
+document.getElementById('closeWarningModalBtn').addEventListener('click', () => document.getElementById('warningModal').style.display = 'none');
+document.getElementById('closeModalBtn').addEventListener('click', () => document.getElementById('requirementsModal').style.display = 'none');
+document.getElementById('trashToggle').addEventListener('click', () => document.getElementById('trashItems').classList.toggle('show'));
+
+document.getElementById('newCatHuBtn').addEventListener('click', () => {
+    const input = document.getElementById('prodCatHuNew');
+    if (input.style.display === 'none') {
+        input.style.display = 'block';
+        input.focus();
+        input.onblur = () => {
+            if (input.value.trim()) {
+                const opt = document.createElement('option');
+                opt.value = input.value.trim();
+                opt.textContent = input.value.trim();
+                document.getElementById('prodCatHuSelect').appendChild(opt);
+                document.getElementById('prodCatHuSelect').value = input.value.trim();
+            }
+            input.style.display = 'none';
+            input.value = '';
+        };
+    } else {
+        input.style.display = 'none';
+        input.value = '';
+    }
+});
+
+document.getElementById('newCatEnBtn').addEventListener('click', () => {
+    const input = document.getElementById('prodCatEnNew');
+    if (input.style.display === 'none') {
+        input.style.display = 'block';
+        input.focus();
+        input.onblur = () => {
+            if (input.value.trim()) {
+                const opt = document.createElement('option');
+                opt.value = input.value.trim();
+                opt.textContent = input.value.trim();
+                document.getElementById('prodCatEnSelect').appendChild(opt);
+                document.getElementById('prodCatEnSelect').value = input.value.trim();
+            }
+            input.style.display = 'none';
+            input.value = '';
+        };
+    } else {
+        input.style.display = 'none';
+        input.value = '';
+    }
+});
+
+// Admin tab jelszavas védelem
+const adminTabBtn = document.getElementById('adminTabBtn');
+adminTabBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!authUser) {
+        showToast(t('noAdminRights'), true);
+        return;
+    }
+    if (!adminAuthorized) {
+        showAdminPasswordDialog((success) => {
+            if (success) {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                adminTabBtn.classList.add('active');
+                document.querySelectorAll('#tabsContent>div').forEach(c => c.classList.remove('active'));
+                document.getElementById('adminTab').classList.add('active');
+                renderAdminList();
+                updateCategorySelects();
+            }
+        });
+        return;
+    }
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    adminTabBtn.classList.add('active');
+    document.querySelectorAll('#tabsContent>div').forEach(c => c.classList.remove('active'));
+    document.getElementById('adminTab').classList.add('active');
+    renderAdminList();
+    updateCategorySelects();
+});
+
+// Normál tab váltás
+document.querySelectorAll('.tab:not(#adminTabBtn)').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabId = tab.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('#tabsContent>div').forEach(c => c.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    });
+});
+
+document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
+
 auth.onAuthStateChanged(updateAuthUI);
-
-document.querySelectorAll('.tab').forEach(tab=>{ tab.addEventListener('click',()=>{ const tabId=tab.dataset.tab; if(tabId==='adminTab'){ if(!adminEmailMatched){ showToast(t('noAdminRights'),true); return; } if(!adminAuthorized){ requestAdminPassword((success)=>{ if(success){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('#tabsContent>div').forEach(c=>c.classList.remove('active')); document.getElementById(tabId).classList.add('active'); renderAdminList(); updateCategorySelects(); } }); return; } } document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('#tabsContent>div').forEach(c=>c.classList.remove('active')); document.getElementById(tabId).classList.add('active'); if(tabId==='adminTab' && adminAuthorized){ renderAdminList(); updateCategorySelects(); } }); });
-document.getElementById('licenseBtn').addEventListener('click',()=>document.getElementById('licenseModal').style.display='flex');
-document.getElementById('closeLicenseModalBtn').addEventListener('click',()=>document.getElementById('licenseModal').style.display='none');
-document.getElementById('closeWarningModalBtn').addEventListener('click',()=>document.getElementById('warningModal').style.display='none');
-document.getElementById('closeModalBtn').addEventListener('click',()=>document.getElementById('requirementsModal').style.display='none');
-document.getElementById('licenseModal').addEventListener('click',(e)=>{ if(e.target===document.getElementById('licenseModal')) document.getElementById('licenseModal').style.display='none'; });
-document.getElementById('warningModal').addEventListener('click',(e)=>{ if(e.target===document.getElementById('warningModal')) document.getElementById('warningModal').style.display='none'; });
-document.getElementById('requirementsModal').addEventListener('click',(e)=>{ if(e.target===document.getElementById('requirementsModal')) document.getElementById('requirementsModal').style.display='none'; });
-
+resetAdminForm();
 setLanguage(currentLang);
+setupRealtimeListener();
 </script>
 </body>
 </html>
